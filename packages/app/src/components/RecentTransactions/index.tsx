@@ -1,6 +1,7 @@
-import { PropsWithChildren } from 'react';
+import { AirplaneTilt } from 'phosphor-react';
+import TransactionItem from './TransactionItem';
 
-const index = ({ children }: PropsWithChildren) => {
+const RecentTransactions = () => {
   return (
     <div className="w-full max-w-md mt-auto h-[350px] max-h-[400px] ">
       <div className="w-full flex justify-between items-center py-3">
@@ -10,10 +11,19 @@ const index = ({ children }: PropsWithChildren) => {
         </span>
       </div>
       <div className="w-full flex flex-col items-center justify-center gap-4">
-        {children}
+        {[...Array(4).keys()].map((_transaction) => (
+          // eslint-disable-next-line react/jsx-key
+          <TransactionItem
+            amount={25}
+            currency={'$'}
+            date={'2023-01-26'}
+            merchant={'eMAG'}
+            merchantLogoUrl={<AirplaneTilt className="h-16 w-16 p-4" />}
+          />
+        ))}
       </div>
     </div>
   );
 };
 
-export default index;
+export default RecentTransactions;

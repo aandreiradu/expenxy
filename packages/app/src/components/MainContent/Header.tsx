@@ -1,9 +1,9 @@
-interface MainContentHeaderProps {
+interface HeaderProps {
   title: string;
   userFullname: string;
 }
 
-const Header = ({ title, userFullname }: MainContentHeaderProps) => {
+const Header = ({ title, userFullname }: HeaderProps) => {
   return (
     <>
       <span className="capitalize text-xs text-gray-400 italic">
