@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
-import ReactSVG from '../../../public/vite.svg';
 
-interface TransactionItemsProps {
+interface TransactionItemProps {
   merchant: string;
   date: string;
   amount: number;
@@ -9,13 +8,13 @@ interface TransactionItemsProps {
   merchantLogoUrl?: ReactNode;
 }
 
-const RecentTransactionsItems = ({
+const TransactionItem = ({
   amount,
   currency,
   date,
   merchant,
   merchantLogoUrl,
-}: TransactionItemsProps) => {
+}: TransactionItemProps) => {
   return (
     <div className="flex bg-white w-full items-center rounded-md">
       <div className="flex-shrink-0 bg-yellow-200 rounded-md">
@@ -35,4 +34,4 @@ const RecentTransactionsItems = ({
   );
 };
 
-export default RecentTransactionsItems;
+export default TransactionItem;
