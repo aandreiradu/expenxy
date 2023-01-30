@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  username     String    @unique
+  password     String
+  email        String    @unique
+  baseCurrency String    @default("RON")
+  refreshToken String?
+  accessToken  String?
+  Account      Account[]
+}
+
+model Account {
+  id       String @id @default(uuid())
+  userId   String
+  type     String
+  currency String
+  balance  Int
+
+  user         User           @relation(fields: [userId], references: [id])
+  Transactions Transactions[]
+}
+
+model Transactions {
+  id       String @id @default(uuid())
+  type     String
+  amount   Int
+  merchant String
+
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
+}
+
+model Currency {
+  id     String @id @default(uuid())
+  name   String
+  code   String
+  symbol String
+
+  @@unique([code, symbol, name])
+}
