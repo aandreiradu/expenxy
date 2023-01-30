@@ -41,9 +41,7 @@ model Transactions {
 
 model Currency {
   id     String @id @default(uuid())
-  name   String
-  code   String
-  symbol String
-
-  @@unique([code, symbol, name])
+  name   String @unique
+  code   String @unique
+  symbol String @unique
 }
