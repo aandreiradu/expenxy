@@ -14,7 +14,8 @@ const SetNewPassword = () => {
   const [showModal, setShowModal] = useState<{
     show: boolean;
     message: string;
-  }>({ show: false, message: '' });
+    title?: string;
+  }>({ show: false, message: '', title: '' });
   const { error, isLoading, sendRequest } = useHttpRequest();
   const { token } = useParams();
   const navigate = useNavigate();
@@ -55,7 +56,21 @@ const SetNewPassword = () => {
       },
     });
 
-    console.log('response', response);
+    if (response?.data) {
+      const { message } = response.data;
+      if (message === 'Password updated successfully') {
+        setShowModal({
+          show: true,
+          message:
+            'Your account password was updated successfully. You will be redirected to LogIn',
+          title: 'Congratulations',
+        });
+        reset();
+        setTimeout(() => {
+          navigate('/login');
+        }, 9000);
+      }
+    }
   };
 
   useEffect(() => {
@@ -69,6 +84,7 @@ const SetNewPassword = () => {
 
   useEffect(() => {
     if (error) {
+      console.log('error', error);
       const { message, fieldErrors } = error;
 
       switch (message) {
@@ -92,7 +108,7 @@ const SetNewPassword = () => {
           reset();
           setTimeout(() => {
             navigate('/reset');
-          }, 3000);
+          }, 7000);
           break;
         }
 
@@ -100,6 +116,14 @@ const SetNewPassword = () => {
           setShowModal({
             show: true,
             message: 'Something went wrong. Please contact the administrator',
+          });
+          break;
+        }
+
+        case 'Old password and new password cannot be the same': {
+          setShowModal({
+            show: true,
+            message: 'Old password and new password cannot be the same',
           });
           break;
         }
@@ -123,7 +147,7 @@ const SetNewPassword = () => {
       {error && showModal.show && (
         <Modal
           show={showModal.show}
-          title="Ooops!"
+          title={showModal.title ?? 'Ooops!'}
           message={showModal.message}
           onConfirm={() => setShowModal({ message: '', show: false })}
         />

@@ -200,7 +200,6 @@ export const useHttpRequest = () => {
       } catch (error) {
         const customError: any = error;
         console.log('error useHttpRequest', customError.response);
-        console.log('error este', customError?.response.data.error);
 
         // setTimeout(() => {
         dispatch({

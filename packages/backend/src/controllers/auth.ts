@@ -304,9 +304,10 @@ export const setNewPassword = async (
       });
     }
 
-    console.log('return ok');
     return res.status(200).send({
-      message: 'Password updated successfully',
+      data: {
+        message: 'Password updated successfully',
+      },
     });
   } catch (error) {
     console.log('ERROR setNewPassword', error);
