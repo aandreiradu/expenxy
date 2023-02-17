@@ -14,6 +14,7 @@ const RecentTransactions = () => {
         {[...Array(4).keys()].map((_transaction) => (
           // eslint-disable-next-line react/jsx-key
           <TransactionItem
+            key={_transaction}
             amount={25}
             currency={'$'}
             date={'2023-01-26'}

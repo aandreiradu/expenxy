@@ -8,14 +8,16 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(uuid())
-  username     String    @unique
-  password     String
-  email        String    @unique
-  baseCurrency String    @default("RON")
-  refreshToken String?
-  accessToken  String?
-  Account      Account[]
+  id                   String    @id @default(uuid())
+  username             String    @unique
+  password             String
+  email                String    @unique
+  baseCurrency         String    @default("RON")
+  refreshToken         String?
+  accessToken          String?
+  resetPasswordToken   String?
+  resetTokenExpiration DateTime?
+  Account              Account[]
 }
 
 model Account {
