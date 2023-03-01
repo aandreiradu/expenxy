@@ -189,19 +189,17 @@ export const useHttpRequest = () => {
 
         console.log('response hook', response);
 
-        // setTimeout(() => {
         dispatch({
           type: ActionTypes.RESPONSE,
           payload: response.data,
         });
-        // }, 10000);
 
+        response.data.status = response.status;
         return response.data;
       } catch (error) {
         const customError: any = error;
         console.log('error useHttpRequest', customError.response);
 
-        // setTimeout(() => {
         dispatch({
           type: ActionTypes.ERROR,
           payload: {
@@ -210,7 +208,6 @@ export const useHttpRequest = () => {
             ...customError?.response.data.error,
           },
         });
-        // }, 10000);
       }
     },
     [],

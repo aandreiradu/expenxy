@@ -1,6 +1,3 @@
-import Sidebar from './components/Sidebar';
-import MainContent from './components/MainContent';
-import RecentTransactions from './components/RecentTransactions';
 import { Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';

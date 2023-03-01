@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginSchema } from './schema';
 import { useHttpRequest } from '../../hooks/useHttp';
 import { useAppDispatch } from '../../store/hooks';
-import { setAccessToken } from '../../store/User/index.slice';
+import { setAccessToken, setAuthData } from '../../store/User/index.slice';
 import { useCallback, useEffect, useState } from 'react';
 import Modal from '../../components/UI/Modal';
 import { PulseLoader } from 'react-spinners';
@@ -75,7 +75,7 @@ const Login = () => {
       const { accessToken, username } = response.data;
 
       if (accessToken && username) {
-        dispatch(setAccessToken({ accessToken: accessToken }));
+        dispatch(setAuthData({ accessToken: accessToken, username: username }));
         navigate('/');
       }
     }

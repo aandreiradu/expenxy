@@ -9,8 +9,8 @@ const Header = ({ title, userFullname }: HeaderProps) => {
       <span className="capitalize text-xs text-gray-400 italic">
         {title || 'welcome back'}
       </span>
-      <p className="capitalize text-xl text-black italic font-bold">
-        {userFullname || 'Mr. Anderson'}
+      <p className=" text-xl text-black italic font-bold">
+        {userFullname || ''}
       </p>
     </>
   );

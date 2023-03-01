@@ -26,11 +26,20 @@ module.exports = {
           '0%': { transform: 'scale(0)' },
           '100%': { transform: 'scale(1)' },
         },
+        growingWidth: {
+          from: {
+            width: '0%',
+          },
+          to: {
+            width: '100%',
+          },
+        },
       },
       animation: {
         typing: 'typing 3s infinite',
         cursor: 'cursor 1s infinite',
         openScale: 'openScale .25s linear',
+        growingWidth: 'growingWidth .25s linear',
       },
     },
   },

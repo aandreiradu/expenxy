@@ -1,15 +1,34 @@
-import { ReactNode } from 'react';
+import { Dispatch, FC, ReactNode, SetStateAction, useCallback } from 'react';
+import { TShowComponent } from '../../pages/Home';
 
 export interface SidebarLinkProps {
   href: string;
   icon: ReactNode;
+  setShowComponent?: Dispatch<SetStateAction<TShowComponent>>;
+  name: string;
+  className?: string;
 }
 
-const SidebarLink = ({ href, icon }: SidebarLinkProps) => {
+const SidebarLink: FC<SidebarLinkProps> = ({
+  href,
+  icon,
+  setShowComponent,
+  name,
+  className,
+}) => {
+  const clickHandler = () => {
+    if (setShowComponent) {
+      setShowComponent({
+        show: true,
+        componentName: name,
+      });
+    }
+  };
+
   return (
     <a
-      href={href}
-      className="p-3 group hover:bg-black rounded-md hover:shadow-md"
+      onClick={clickHandler}
+      className={`p-3 group hover:bg-black rounded-md hover:shadow-md ${className}`}
     >
       {icon}
     </a>

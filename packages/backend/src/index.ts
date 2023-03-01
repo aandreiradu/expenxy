@@ -6,6 +6,8 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import corsOptions from './config/corsOptions';
 import bodyParser from 'body-parser';
+import checkJWTToken from './middlewares/checkJWTToken';
+import { ICustomRequest } from './middlewares/checkJWTToken';
 
 const app = express();
 
@@ -25,13 +27,25 @@ interface CustomError extends Error {
   error?: string[];
 }
 
-interface ResponseAPI {
+export interface ResponseAPI {
   message: string;
   data?: string | string[];
   error?: string[];
 }
 
 app.use('/', routes);
+
+app.use(checkJWTToken);
+
+app.use('/test', (req: Request, res: Response, next: NextFunction) => {
+  const authorizationToken =
+    req.headers['authorization'] || req.headers['Authorization'];
+  return res.status(200).send({
+    data: {
+      authorizationToken,
+    },
+  });
+});
 
 app.use(
   (
