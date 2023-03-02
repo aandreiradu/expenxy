@@ -7,7 +7,7 @@ import cors from 'cors';
 import corsOptions from './config/corsOptions';
 import bodyParser from 'body-parser';
 import checkJWTToken from './middlewares/checkJWTToken';
-import { ICustomRequest } from './middlewares/checkJWTToken';
+import transactionRoutes from '../routes/transactions/index';
 
 const app = express();
 
@@ -37,15 +37,8 @@ app.use('/', routes);
 
 app.use(checkJWTToken);
 
-app.use('/test', (req: Request, res: Response, next: NextFunction) => {
-  const authorizationToken =
-    req.headers['authorization'] || req.headers['Authorization'];
-  return res.status(200).send({
-    data: {
-      authorizationToken,
-    },
-  });
-});
+// Transaction Routes
+app.use(transactionRoutes);
 
 app.use(
   (

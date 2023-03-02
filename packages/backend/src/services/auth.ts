@@ -90,6 +90,8 @@ interface IAuthService {
   setNewPassword(password: string, resetToken: string): Promise<boolean>;
 
   logout(refreshToken: string): Promise<void>;
+
+  getUserById(userId: string): Promise<any>;
 }
 
 export const AuthService: IAuthService = {
@@ -421,5 +423,18 @@ export const AuthService: IAuthService = {
         },
       });
     }
+  },
+
+  async getUserById(userId: string) {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return user?.id;
   },
 };

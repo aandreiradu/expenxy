@@ -14,35 +14,32 @@ export const createTransactionSchema = z
     date: z.string(),
   })
   .refine(
-    (data) =>
-      (data.transactionType as string) !== 'Expense' &&
-      data.transactionType !== 'Income',
-    {
-      path: ['transactionType'],
-      message: 'Invalid transaction type',
-    },
+    (data) => (
+      (data.transactionType as string) != 'Expense' &&
+        (data.transactionType as string) != 'Income',
+      {
+        path: ['transactionType'],
+        message: 'Invalid transaction type',
+      }
+    ),
   );
 
 export type CreateTransactionArgs = z.infer<typeof createTransactionSchema>;
 
 interface ITransaction {
   createTransaction(
-    args: CreateTransactionArgs & { refreshToken: string },
+    args: CreateTransactionArgs & { userId: string },
   ): Promise<string>;
 }
 
 export const TransactionService: ITransaction = {
-  async createTransaction(
-    args: CreateTransactionArgs & { refreshToken: string },
-  ) {
-    const { refreshToken, amount, merchant, transactionType } = args;
+  async createTransaction(args: CreateTransactionArgs & { userId: string }) {
+    const { userId: userIdArgs, amount, merchant, transactionType } = args;
 
-    const { userId, username } = await AuthService.getUserByRefreshToken(
-      refreshToken,
-    );
+    const userId = await AuthService.getUserById(userIdArgs);
 
-    if (!userId || !username) {
-      throw new Error('Could not identify user by refresh token');
+    if (!userId) {
+      throw new Error('Could not identify the user by userId');
     }
 
     // Create transaction
