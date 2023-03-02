@@ -14,20 +14,10 @@ type TAddTransaction = TShowComponent & {
   setShowComponent: Dispatch<SetStateAction<TShowComponent>>;
 };
 
-const typeProps: { value: AvailableTypes }[] = [
-  { value: 'Expense' },
-  { value: 'Income' },
-];
-const currencyProps: { value: AvailableCurrency }[] = [
-  { value: 'EUR' },
-  { value: 'RON' },
-];
+const typeProps: { value: AvailableTypes }[] = [{ value: 'Expense' }, { value: 'Income' }];
+const currencyProps: { value: AvailableCurrency }[] = [{ value: 'EUR' }, { value: 'RON' }];
 
-const AddTransaction: FC<TAddTransaction> = ({
-  show,
-  componentName,
-  setShowComponent,
-}) => {
+const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowComponent }) => {
   const {
     register,
     handleSubmit,
@@ -73,13 +63,8 @@ const AddTransaction: FC<TAddTransaction> = ({
             <div className="max-w-sm md:max-w-md w-full relative bg-black text-white gap-6 z-[11] rounded-xl ">
               <div className="w-full h-full flex flex-col pt-2 pb-5">
                 <div className="flex">
-                  <h2 className="text-center flex-1 text-lg">
-                    New Transaction
-                  </h2>
-                  <span
-                    className="ml-auto mr-4 text-lg cursor-pointer"
-                    onClick={closeAddTransaction}
-                  >
+                  <h2 className="text-center flex-1 text-lg">New Transaction</h2>
+                  <span className="ml-auto mr-4 text-lg cursor-pointer" onClick={closeAddTransaction}>
                     X
                   </span>
                 </div>

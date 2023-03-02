@@ -31,6 +31,16 @@ interface IResponse<T = any> {
 //       },
 //     });
 //   }
+// export const createTransactionController = async (
+//   req: Request<{}, {}, CreateTransactionArgs>,
+//   res: Response<IResponse>,
+//   next: NextFunction,
+// ) => {
+//   console.log('req.body', req.body);
+//   const result = createTransactionSchema.safeParse(req.body);
+//   console.log('result', result);
+//   if (!result.success) {
+//     const formatted = result.error.flatten();
 
 //   try {
 //     const userId = req.metadata.userId as string;
@@ -55,6 +65,28 @@ interface IResponse<T = any> {
 //     });
 
 //     console.log('id createTransactionController', id);
+
+// try {
+//   const userId = req.metadata.userId as string;
+//   console.log('userId', userId);
+//   const { amount, merchant, transactionType, date, currency } = req.body;
+//   console.log('req.body', req.body);
+
+//   if (!userId) {
+//     console.log('no user found in metadata');
+//     return res.status(400).send({
+//       message: "Couldn't identify the user",
+//     });
+//   }
+
+//   const id = await TransactionService.createTransaction({
+//     amount,
+//     merchant,
+//     transactionType,
+//     currency,
+//     date,
+//     userId,
+//   });
 
 //     return res.status(200).send({
 //       message: 'Transaction created successfully',

@@ -16,6 +16,8 @@ export const createTransactionSchema = z
   .refine(
     (data) => (
       (data.transactionType as string) != 'Expense' && (data.transactionType as string) != 'Income',
+      (data.transactionType as string) != 'Expense' &&
+        (data.transactionType as string) != 'Income',
       {
         path: ['transactionType'],
         message: 'Invalid transaction type',
@@ -51,4 +53,36 @@ export const TransactionService: ITransaction = {
   //   console.log('created this transaction', transactionId);
   //   return transactionId;
   // },
-};
+  createTransaction?(
+    args: CreateTransactionArgs & { userId: string },
+  ): Promise<string>;
+}
+
+// export const TransactionService: ITransaction = {
+//   async createTransaction(args: CreateTransactionArgs & { userId: string }) {
+//     const { userId: userIdArgs, amount, merchant, transactionType } = args;
+
+//     const userId = await AuthService.getUserById(userIdArgs);
+
+//     if (!userId) {
+//       throw new Error('Could not identify the user by userId');
+//     }
+
+//     // Create transaction
+//     const { id: transactionId } = await prisma.transactions.create({
+//       data: {
+//         amount: amount,
+//         merchant: merchant,
+//         type: transactionType,
+//         accountId: userId,
+//       },
+//       select: {
+//         id: true,
+//       },
+//     });
+//     console.log('created this transaction', transactionId);
+
+//     return transactionId;
+//   },
+// >>>>>>> 35f5067 (create bank account)
+// };

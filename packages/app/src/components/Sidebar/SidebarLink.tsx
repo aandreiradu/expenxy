@@ -11,14 +11,7 @@ export interface SidebarLinkProps {
   isLink?: boolean;
 }
 
-const SidebarLink: FC<SidebarLinkProps> = ({
-  href,
-  icon,
-  setShowComponent,
-  name,
-  className,
-  isLink = false,
-}) => {
+const SidebarLink: FC<SidebarLinkProps> = ({ href, icon, setShowComponent, name, className, isLink = false }) => {
   const navigate = useNavigate();
 
   const clickHandler = () => {
@@ -41,12 +34,7 @@ const SidebarLink: FC<SidebarLinkProps> = ({
   };
 
   return (
-    <button
-      onClick={clickHandler}
-      className={`p-3 group hover:bg-black rounded-md hover:shadow-md ${
-        className ?? ''
-      }`}
-    >
+    <button onClick={clickHandler} className={`p-3 group hover:bg-black rounded-md hover:shadow-md ${className ?? ''}`}>
       {icon}
     </button>
   );

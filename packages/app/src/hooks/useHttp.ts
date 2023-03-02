@@ -80,50 +80,45 @@ const apiReducer = (state: IState, action: IAction): any => {
 
 export const useHttpRequest = () => {
   const axiosPrivate = useAxiosInterceptors();
-  const [state, dispatch] = useReducer<Reducer<IState, IAction>>(
-    apiReducer,
-    initialState,
-  );
+  const [state, dispatch] = useReducer<Reducer<IState, IAction>>(apiReducer, initialState);
 
-  const sendRequest = useCallback(
-    async (config: IRequestConfig): Promise<CustomAxiosResponse | void> => {
-      const { body, headers, method, url, withCredentials } = config;
+  const sendRequest = useCallback(async (config: IRequestConfig): Promise<CustomAxiosResponse | void> => {
+    const { body, headers, method, url, withCredentials } = config;
 
-      try {
-        dispatch({ type: ActionTypes.SEND });
-        const response = await axiosPrivate({
-          method: method ? method : 'GET',
-          url,
-          data: body,
-          headers: headers ? headers : {},
-          withCredentials: withCredentials ? withCredentials : false,
-        });
+    try {
+      dispatch({ type: ActionTypes.SEND });
+      const response = await axiosPrivate({
+        method: method ? method : 'GET',
+        url,
+        data: body,
+        headers: headers ? headers : {},
+        withCredentials: withCredentials ? withCredentials : false,
+      });
 
-        // setTimeout(() => {
-        dispatch({
-          type: ActionTypes.RESPONSE,
-          payload: response.data,
-        });
-        // }, 5000);
+      // setTimeout(() => {
+      dispatch({
+        type: ActionTypes.RESPONSE,
+        payload: response.data,
+      });
+      // }, 5000);
 
-        response.data.status = response.status;
-        return response.data;
-      } catch (error) {
-        const customError: any = error;
-        console.log('error useHttp', error);
+      response.data.status = response.status;
+      response.data.status = response.status;
+      return response.data;
+    } catch (error) {
+      const customError: any = error;
+      console.log('error useHttp', error);
 
-        dispatch({
-          type: ActionTypes.ERROR,
-          payload: {
-            status: customError?.response.status || 500,
-            message: customError?.response.data.message,
-            ...customError?.response.data.error,
-          },
-        });
-      }
-    },
-    [],
-  );
+      dispatch({
+        type: ActionTypes.ERROR,
+        payload: {
+          status: customError?.response.status || 500,
+          message: customError?.response.data.message,
+          ...customError?.response.data.error,
+        },
+      });
+    }
+  }, []);
 
   return {
     sendRequest,
