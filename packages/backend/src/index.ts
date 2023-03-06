@@ -7,7 +7,9 @@ import cors from 'cors';
 import corsOptions from './config/corsOptions';
 import bodyParser from 'body-parser';
 import checkJWTToken from './middlewares/checkJWTToken';
-import transactionRoutes from '../routes/transactions/index';
+import authRoutes from './routes/auth';
+import transactionRoutes from './routes/transactions';
+import accountRoutes from './routes/account';
 
 const app = express();
 
@@ -15,7 +17,13 @@ const app = express();
 app.use(cookieParser());
 
 // app.use(cors<Request>());
-app.use(cors({ origin: true, optionsSuccessStatus: 200, credentials: true }));
+app.use(
+  cors({
+    origin: true,
+    optionsSuccessStatus: 200,
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 app.use(bodyParser.json()); // for json
@@ -33,12 +41,13 @@ export interface ResponseAPI {
   error?: string[];
 }
 
-app.use('/', routes);
+app.use(authRoutes);
 
 app.use(checkJWTToken);
 
-// Transaction Routes
 app.use(transactionRoutes);
+
+app.use(accountRoutes);
 
 app.use(
   (

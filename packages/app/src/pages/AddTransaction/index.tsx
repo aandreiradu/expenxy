@@ -51,8 +51,15 @@ const AddTransaction: FC<TAddTransaction> = ({
 
     const response = await sendRequest({
       url: '/test',
-      method: 'GET',
+      method: 'POST',
       withCredentials: true,
+      body: {
+        transactionType: data.transactionType,
+        amount: data.amount,
+        merchant: data.merchant,
+        currency: data.currency,
+        date: data.date,
+      },
     });
 
     console.log('response', response);

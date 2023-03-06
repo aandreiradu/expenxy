@@ -47,3 +47,9 @@ model Currency {
   code   String @unique
   symbol String @unique
 }
+
+model EXPENXY_CUSTOM_CONFIG {
+  id         String @id @default(uuid())
+  name       String @unique
+  configJSON Json
+}

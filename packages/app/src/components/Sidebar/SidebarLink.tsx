@@ -26,12 +26,14 @@ const SidebarLink: FC<SidebarLinkProps> = ({
   };
 
   return (
-    <a
+    <button
       onClick={clickHandler}
-      className={`p-3 group hover:bg-black rounded-md hover:shadow-md ${className}`}
+      className={`p-3 group hover:bg-black rounded-md hover:shadow-md ${
+        className ?? ''
+      }`}
     >
       {icon}
-    </a>
+    </button>
   );
 };
 

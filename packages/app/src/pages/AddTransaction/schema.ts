@@ -1,7 +1,29 @@
 import { z } from 'zod';
 
-const CurrencyEnums = z.enum(['EUR', 'RON']);
-const TransactionTypesEnums = z.enum(['Income', 'Expense']);
+export const CurrencyEnums = z.enum(['EUR', 'RON'], {
+  errorMap: (issue) => {
+    switch (issue.code) {
+      case 'invalid_enum_value':
+      case 'invalid_type':
+        return { message: 'Invalid Currency' };
+
+      default:
+        return { message: 'Invalid Currency' };
+    }
+  },
+});
+const TransactionTypesEnums = z.enum(['Income', 'Expense'], {
+  errorMap: (issue) => {
+    switch (issue.code) {
+      case 'invalid_enum_value':
+      case 'invalid_type':
+        return { message: 'Invalid Transaction Type' };
+
+      default:
+        return { message: 'Invalid Transaction Type' };
+    }
+  },
+});
 
 export const addTransactionSchema = z.object({
   transactionType: TransactionTypesEnums,
@@ -10,24 +32,5 @@ export const addTransactionSchema = z.object({
   currency: CurrencyEnums,
   date: z.string(),
 });
-// .refine(
-//   (data) =>
-//     (data.transactionType as string) === 'Expense' &&
-//     (data.transactionType as string) === 'Income',
-//   {
-//     path: ['transactionType'],
-//     message: 'Invalid transaction type',
-//   },
-// )
-// .refine(
-//   (data) => (
-//     (data.currency as string) !== 'EUR' &&
-//       (data.transactionType as string) !== 'RON',
-//     {
-//       path: ['currency'],
-//       message: 'Invalid currency',
-//     }
-//   ),
-// );
 
 export type AddTransactionProps = z.infer<typeof addTransactionSchema>;

@@ -3,21 +3,17 @@ import axiosCustom from '../api/axios';
 import useRefreshToken from './useRefreshToken';
 import { selectAccessToken } from '../store/User/index.selector';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const useAxiosInterceptors = () => {
   const refreshToken = '';
   const accessToken = useSelector(selectAccessToken);
-
-  console.log('accessToken', accessToken);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const requestIntercept = axiosCustom.interceptors.request.use(
       (config: any) => {
         if (!(config.headers.Authorization || config.headers.authorization)) {
-          console.log(
-            'suntem in requestIntercept?? si punem urm accessToken',
-            accessToken,
-          );
           config.headers = {
             ...config.headers,
             Authorization: `EXPENXY ${accessToken}`,
@@ -33,18 +29,26 @@ const useAxiosInterceptors = () => {
         return response;
       },
       async (error) => {
+        console.log('error response interceptor', error);
         const prevRequest = error.config;
 
         if (error?.response?.status === 403 && !prevRequest?.sent) {
-          console.log('suntem aici ???');
           prevRequest.sent = true;
           const newAccessToken = await useRefreshToken();
-          console.log('newAccessToken', newAccessToken);
           prevRequest.headers = {
             ...prevRequest.headers,
-            Authorization: `Bearer ${newAccessToken}`,
+            Authorization: `EXPENXY ${newAccessToken}`,
           };
           return axiosCustom(prevRequest);
+        } else if (error?.response?.status === 401 && !prevRequest.sent) {
+          const { message } = error?.response.data;
+
+          if (message === 'Unauthorized') {
+            console.log(
+              'Status 401 and Unauthorized in response interceptor, redirect to login',
+            );
+            navigate('/login');
+          }
         } else if (error?.response?.status === 404 && !prevRequest?.sent) {
           throw error;
         }

@@ -12,7 +12,7 @@ import {
 } from '../services/auth';
 import { sendMail } from '../utils/sendMail';
 
-interface IResponse<T = any> {
+export interface IResponse<T = any> {
   message?: string;
   data?: T;
   error?: {
@@ -99,7 +99,9 @@ export const authController = async (
       sameSite: 'none',
       secure: true,
     });
-    return next({ message: 'Something went wrong. Please try again later' });
+
+    // return next({ message: 'Something went wrong. Please try again later' });
+    return next(error);
   }
 };
 

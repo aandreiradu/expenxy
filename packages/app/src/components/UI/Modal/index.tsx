@@ -12,33 +12,7 @@ interface ModalArgs {
 }
 
 const Modal = ({ onConfirm, linkUrl, message, title, show }: ModalArgs) => {
-  // const confirmHandler = useCallback(() => {
-  //   onConfirm(false);
-  // }, []);
-
   return (
-    // <div className="fixed flex items-center justify-center w-full h-screen bg-black/75 z-50">
-    //   <div className="z-[100] fixed top-[30vh] w-[30rem] shadow-modal bg-[#242832] py-5 pb-5 text-white max-w-sm rounded-lg animate-openScale">
-    //     <Overlay />
-    //     <span
-    //       className={'flex items-center justify-end text-2xl cursor-pointer'}
-    //       onClick={confirmHandler}
-    //     >
-    //       &times;
-    //     </span>
-    //     <h2 className="mt-5 text-xl">{title || ''}</h2>
-    //     <p className="text-sm">
-    //       {message || 'Something went wrong, please try again later!'}
-    //     </p>
-    //     <button
-    //       className="bg-[#26303B] w-full p-2 text-sm font-bold uppercase mt-6 cursor-pointer rounded-[99px] hover:bg-[#26303B]"
-    //       onClick={confirmHandler}
-    //     >
-    //       Close
-    //     </button>
-    //   </div>
-    // </div>
-
     <Transition appear show={show} as={Fragment}>
       <Dialog
         as="div"

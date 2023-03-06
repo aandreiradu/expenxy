@@ -76,7 +76,7 @@ const Login = () => {
 
       if (accessToken && username) {
         dispatch(setAuthData({ accessToken: accessToken, username: username }));
-        navigate('/');
+        navigate('/create-banking-account');
       }
     }
   };
@@ -132,7 +132,7 @@ const Login = () => {
           Forgot your password
         </span>
         <button
-          disabled={Object.keys(errors).length > 0 || isLoading}
+          // disabled={Object.keys(errors).length > 0 || isLoading}
           form="login"
           className="disabled:cursor-not-allowed disabled:pointer-events-none w-full bg-[#1f1f1f] mt-7 p-3 rounded-md text-lg uppercase hover:bg-white hover:text-[#1f1f1f] focus:bg-white focus:text-[#1f1f1f] focus:outline-none transition-all duration-100 ease-in"
         >

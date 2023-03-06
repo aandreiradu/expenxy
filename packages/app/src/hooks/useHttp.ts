@@ -116,6 +116,11 @@ interface IState {
   };
 }
 
+interface CustomAxiosResponse extends AxiosResponse {
+  message?: string;
+  status: number;
+}
+
 enum ActionTypes {
   SEND = 'SEND',
   RESPONSE = 'RESPONSE',
@@ -174,7 +179,7 @@ export const useHttpRequest = () => {
   );
 
   const sendRequest = useCallback(
-    async (config: IRequestConfig): Promise<AxiosResponse | void> => {
+    async (config: IRequestConfig): Promise<CustomAxiosResponse | void> => {
       const { body, headers, method, url, withCredentials } = config;
 
       try {
@@ -198,7 +203,8 @@ export const useHttpRequest = () => {
         return response.data;
       } catch (error) {
         const customError: any = error;
-        console.log('error useHttpRequest', customError.response);
+        console.log('err', error);
+        console.log('error useHttpRequest', customError?.response);
 
         dispatch({
           type: ActionTypes.ERROR,

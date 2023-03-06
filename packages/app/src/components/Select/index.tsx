@@ -2,6 +2,7 @@ import React from 'react';
 import { forwardRef, useId } from 'react';
 import { ComponentPropsWithoutRef } from 'react';
 import Label from '../Label';
+import { ArrowDown } from 'phosphor-react';
 
 type dataSourceValue = {
   value: string;
