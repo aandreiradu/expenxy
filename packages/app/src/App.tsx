@@ -7,7 +7,7 @@ import Persist from './components/Persist';
 import ResetPassword from './pages/ResetPassword';
 import ResetPasswordEmailSent from './pages/ResetPassword/EmailSent';
 import SetNewPassword from './pages/ResetPassword/SetNewPassword';
-import CreateBankAccountLayouts from './pages/Account/CreateBankAccount';
+import CreateBankAccount from './pages/Account/CreateBankAccount';
 
 function App() {
   return (
@@ -20,10 +20,7 @@ function App() {
         <Route path="/reset/:token" element={<SetNewPassword />} />
         <Route element={<Persist />}>
           <Route path="/" element={<Home />} />
-          <Route
-            path="/create-bank-account"
-            element={<CreateBankAccountLayouts title="Create bank account" />}
-          />
+          <Route path="/create-bank-account" element={<CreateBankAccount title="Create bank account" />} />
         </Route>
         <Route path="*" element={<NotFound />} />;
       </Routes>

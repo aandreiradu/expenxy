@@ -107,7 +107,8 @@ export const useHttpRequest = () => {
       return response.data;
     } catch (error) {
       const customError: any = error;
-      console.log('error useHttp', error);
+        console.log('err', error);
+      console.log('error useHttp', error?);
 
       dispatch({
         type: ActionTypes.ERROR,

@@ -15,8 +15,7 @@ import Modal from '../../components/UI/Modal';
 import { PulseLoader } from 'react-spinners';
 
 const title = 'Your Finances In One Place';
-const description =
-  'Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati, fuga!';
+const description = 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati, fuga!';
 
 type ValidationErrors = {
   username: 'username';
@@ -93,22 +92,11 @@ const Login = () => {
 
   return (
     <AuthLayout title={title} description={description}>
-      {error && showModal && (
-        <Modal
-          onConfirm={setShowModal}
-          show={showModal}
-          title={'Ooops'}
-          message={error.message}
-        />
-      )}
+      {error && showModal && <Modal onConfirm={setShowModal} show={showModal} title={'Ooops'} message={error.message} />}
 
       <h1 className="text-3xl  font-bold">Welcome to EXPENXY</h1>
       <span className="text-base  py-2">Login into your account</span>
-      <form
-        id="login"
-        className="flex flex-col  space-y-10 w-full mt-3"
-        onSubmit={handleSubmit(onSubmit)}
-      >
+      <form id="login" className="flex flex-col  space-y-10 w-full mt-3" onSubmit={handleSubmit(onSubmit)}>
         <div className="relative z-0">
           <Input
             error={errors?.email?.message}
@@ -131,10 +119,7 @@ const Login = () => {
             required
           />
         </div>
-        <span
-          className="text-sm ml-auto text-yellow-500 mt-6 cursor-pointer"
-          onClick={redirectToResetPw}
-        >
+        <span className="text-sm ml-auto text-yellow-500 mt-6 cursor-pointer" onClick={redirectToResetPw}>
           Forgot your password
         </span>
         <button

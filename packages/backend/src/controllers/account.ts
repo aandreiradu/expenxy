@@ -7,11 +7,7 @@ import {
   type HasExistingAccountReturn,
 } from '../services/account';
 
-export const getBankingProductsController = async (
-  req: Request,
-  res: Response<IResponse>,
-  next: NextFunction,
-) => {
+export const getBankingProductsController = async (req: Request, res: Response<IResponse>, next: NextFunction) => {
   try {
     const bankingProducts = await BankAccountService.getBankingProducts();
 
@@ -131,9 +127,7 @@ export const checkBankAccountExisting = async (
   const { accountId } = req.body;
 
   try {
-    const needsBankAccount = await BankAccountService.needsBankAccount(
-      accountId,
-    );
+    const needsBankAccount = await BankAccountService.needsBankAccount(accountId);
     return res.status(200).send({
       data: {
         needsBankAccount,
@@ -153,11 +147,7 @@ export const checkBankAccountExisting = async (
   }
 };
 
-export const test = async (
-  req: Request<{}, {}, { id: string }>,
-  res: Response<IResponse>,
-  next: NextFunction,
-) => {
+export const test = async (req: Request<{}, {}, { id: string }>, res: Response<IResponse>, next: NextFunction) => {
   const { id } = req.body;
 
   const serviceResponse = await BankAccountService.needsBankAccount(id);

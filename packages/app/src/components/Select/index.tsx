@@ -3,9 +3,6 @@ import { forwardRef, useId } from 'react';
 import { ComponentPropsWithoutRef } from 'react';
 import Label from '../Label';
 import { ArrowDown } from 'phosphor-react';
-// import CustomOptionElement from './index.d';
-import { Extended } from './index.d';
-import { useRef } from 'react';
 
 type dataSourceValue = {
   value?: string;

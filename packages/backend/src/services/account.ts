@@ -22,9 +22,7 @@ export const currencyAccountTypes = z.enum(['EUR', 'RON'], {
       case 'invalid_enum_value':
       case 'invalid_type':
         return {
-          message: `Invalid Currency. Expected currencies: ${Object.keys(
-            z.enum(['EUR']),
-          )}`,
+          message: `Invalid Currency. Expected currencies: ${Object.keys(z.enum(['EUR']))}`,
         };
 
       default: {
@@ -59,25 +57,16 @@ export type THasExistingAccount = {
   currency: CreateBankAccountArgs['currency'];
 };
 
-export type HasExistingAccountReturn = Pick<
-  Account,
-  'balance' | 'currency' | 'bankAccountTypeId'
->;
+export type HasExistingAccountReturn = Pick<Account, 'balance' | 'currency' | 'bankAccountTypeId'>;
 
 interface IAccount {
   getBankingProducts(): Promise<{ name: string; id: string }[] | null>;
 
-  createBankAccount(
-    args: CreateBankAccountArgs,
-  ): Promise<{ accountId: string } | null>;
+  createBankAccount(args: CreateBankAccountArgs): Promise<{ accountId: string } | null>;
 
-  hasExistingAccount(
-    args: THasExistingAccount,
-  ): Promise<HasExistingAccountReturn | null>;
+  hasExistingAccount(args: THasExistingAccount): Promise<HasExistingAccountReturn | null>;
 
-  getBankingProductById(
-    id: string,
-  ): Promise<{ id: string; name: string } | undefined>;
+  getBankingProductById(id: string): Promise<{ id: string; name: string } | undefined>;
 
   needsBankAccount(id: string): Promise<boolean>;
 }
@@ -109,16 +98,11 @@ export const BankAccountService: IAccount = {
   },
 
   async createBankAccount(args: CreateBankAccountArgs) {
-    const selectedBankingProduct = await this.getBankingProductById(
-      args.accountTypeId,
-    );
+    const selectedBankingProduct = await this.getBankingProductById(args.accountTypeId);
     console.log('selectedBankingProduct', selectedBankingProduct);
 
     if (!selectedBankingProduct) {
-      console.log(
-        'couldnt identify the banking product, retun null',
-        selectedBankingProduct,
-      );
+      console.log('couldnt identify the banking product, retun null', selectedBankingProduct);
       return null;
     }
 

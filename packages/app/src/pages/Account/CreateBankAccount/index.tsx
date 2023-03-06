@@ -68,18 +68,12 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
       });
 
       if (bankingResponse) {
-        if (
-          bankingResponse?.message ===
-          statsAndMaps['fetchedBankingProductsSuccess']?.message
-        ) {
+        if (bankingResponse?.message === statsAndMaps['fetchedBankingProductsSuccess']?.message) {
           return {
             message: bankingResponse.message,
             bankingProducts: bankingResponse.data.bankingProducts,
           };
-        } else if (
-          bankingResponse?.message ===
-          statsAndMaps['fetchBankingProductsEmpty']?.message
-        ) {
+        } else if (bankingResponse?.message === statsAndMaps['fetchBankingProductsEmpty']?.message) {
           return {
             message: bankingResponse.message,
             bankingProducts: [],
@@ -106,8 +100,7 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
           case statsAndMaps['fetchBankingProductsEmpty']?.message: {
             console.log('empty response from backend, show notification');
             setTopLevelNotification({
-              message:
-                'Ooops! Looks like no banking products are available right now. Please try again later',
+              message: 'Ooops! Looks like no banking products are available right now. Please try again later',
               show: true,
               icon: <Timer className="w-14 h-8 text-yellow-400" />,
             });
@@ -169,8 +162,7 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
         status === statsAndMaps['bankAccountCreatedSuccessfully']?.status &&
         message === statsAndMaps['bankAccountCreatedSuccessfully'].message
       ) {
-        const { frontendMessage } =
-          statsAndMaps['bankAccountCreatedSuccessfully'];
+        const { frontendMessage } = statsAndMaps['bankAccountCreatedSuccessfully'];
         if (frontendMessage) {
           setTimeout(() => {
             navigate('/');
@@ -206,10 +198,7 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
       )}
 
       <section className="relative w-screen h-screen flex flex-col items-center justify-center px-4 ">
-        <img
-          className="absolute top-0 left-0 w-full h-full brightness-[40%]"
-          src="./landing-background.jpg"
-        />
+        <img className="absolute top-0 left-0 w-full h-full brightness-[40%]" src="./landing-background.jpg" />
 
         {isLoading ? (
           <Loader
@@ -265,9 +254,7 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
                         dark:focus:border-[#fff] 
                         focus:outline-none focus:ring-0 focus:border-[#fff]"
                   required
-                  dataSourceGroup={
-                    bankingProducts.length > 0 ? bankingProducts : []
-                  }
+                  dataSourceGroup={bankingProducts.length > 0 ? bankingProducts : []}
                   label="Account Type"
                 />
               </div>

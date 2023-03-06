@@ -114,7 +114,9 @@ export const authController = async (
       sameSite: 'none',
       secure: true,
     });
-    return next({ message: 'Something went wrong. Please try again later' });
+
+    // return next({ message: 'Something went wrong. Please try again later' });
+    return next(error);
   }
 };
 

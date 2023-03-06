@@ -1,8 +1,5 @@
 import { Router } from 'express';
-import {
-  getBankingProductsController,
-  createBankAccountController,
-} from '../../controllers/account';
+import { getBankingProductsController, createBankAccountController } from '../../controllers/account';
 
 const router = Router();
 
