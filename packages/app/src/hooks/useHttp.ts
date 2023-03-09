@@ -103,12 +103,10 @@ export const useHttpRequest = () => {
       // }, 5000);
 
       response.data.status = response.status;
-      response.data.status = response.status;
       return response.data;
     } catch (error) {
       const customError: any = error;
-        console.log('err', error);
-      console.log('error useHttp', error?);
+      console.log('error useHttp', error);
 
       dispatch({
         type: ActionTypes.ERROR,

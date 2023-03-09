@@ -17,8 +17,6 @@ const Persist = () => {
   const navigate = useNavigate();
   const isAuth = useSelector(selectAccessToken);
 
-  console.log('hopa');
-
   useEffect(() => {
     // console.log('Persist effect run');
     let isMounted = true;
