@@ -1,4 +1,9 @@
-type ExistingBackendMessage = 'existingBankAccountFound' | 'testingKeys';
+type ExistingBackendMessage =
+  | 'existingBankAccountFound'
+  | 'testingKeys'
+  | 'fetchedBankingProductsSuccess'
+  | 'fetchBankingProductsEmpty'
+  | 'accountCreatedSuccessfully';
 
 // type IStatsAndMessages = {
 //   [K in ExistingBackendMessage]?: (data: string[]) => {};
@@ -19,13 +24,19 @@ const statsAndMaps: IStatsAndMessages = {
     frontendMessage:
       'Looks like you already have an existing account with the same Currency and Account Type',
   },
-  // existingBankAccountFound: (data) => {
-  //   return {
-  //     message: `We found another bank account associated with you account with the following data`,
-  //     status: 200,
-  //     frontendMessage: `We found another bank account associated with you account with the following data: ${data}`,
-  //   };
-  // },
+  fetchedBankingProductsSuccess: {
+    message: 'Fetched banking products successfully',
+    status: 200,
+  },
+  fetchBankingProductsEmpty: {
+    message: 'No banking products found',
+    status: 200,
+  },
+  accountCreatedSuccessfully: {
+    message: 'Account created successfully',
+    status: 200,
+    frontendMessage: 'Account has been created successfully',
+  },
 };
 
 export default statsAndMaps;

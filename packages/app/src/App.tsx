@@ -22,9 +22,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route
             path="/create-banking-account"
-            element={
-              <CreateBankAccountLayouts title="Create your first bank account" />
-            }
+            element={<CreateBankAccountLayouts title="Create bank account" />}
           />
         </Route>
         <Route path="*" element={<NotFound />} />;

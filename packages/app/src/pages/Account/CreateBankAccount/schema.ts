@@ -19,7 +19,7 @@ export const createBankAccountSchema = z
     accountName: z.string(),
     currency: CurrencyEnums,
     balance: z.string().default('0'),
-    accountType: bankAcountTypes,
+    accountType: z.string().uuid(), //bankAcountTypes,
   })
   .superRefine((val, ctx) => {
     if (parseFloat(val.balance) < parseFloat('-25000')) {

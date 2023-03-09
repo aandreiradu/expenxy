@@ -17,18 +17,16 @@ const Persist = () => {
   const navigate = useNavigate();
   const isAuth = useSelector(selectAccessToken);
 
-  console.log('hopa');
-
   useEffect(() => {
-    console.log('Persist effect run');
+    // console.log('Persist effect run');
     let isMounted = true;
 
     const checkRefreshToken = async () => {
-      console.log('running checkRefreshToken');
+      // console.log('running checkRefreshToken');
       try {
         await refresh();
       } catch (error) {
-        console.error('error checkRefreshToken', error);
+        // console.error('error checkRefreshToken', error);
         if (axios.isAxiosError(error)) {
           const { message }: TAxiosError = error.response?.data;
           if (message === 'Unauthorized') {

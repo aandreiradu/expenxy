@@ -3,6 +3,7 @@ import MainContent from '../../components/MainContent';
 import MobileNav from '../../components/MobileNavbar';
 import RecentTransactions from '../../components/RecentTransactions';
 import Sidebar from '../../components/Sidebar';
+import { useHttpRequest } from '../../hooks/useHttp';
 import { useAppSelector } from '../../store/hooks';
 import { selectAccessToken } from '../../store/User/index.slice';
 import AddTransaction from '../AddTransaction';
@@ -13,6 +14,7 @@ export type TShowComponent = {
 };
 
 const Home = () => {
+  const { error, isLoading, sendRequest } = useHttpRequest();
   const [showComponent, setShowComponent] = useState<TShowComponent>({
     show: false,
     componentName: '',
@@ -21,6 +23,20 @@ const Home = () => {
   useEffect(() => {
     console.log('showComponent', showComponent);
   }, [showComponent]);
+
+  useEffect(() => {
+    const getBankAccountConfig = async () => {
+      const bankingResponse = await sendRequest({
+        url: '/getBankingProducts',
+        method: 'GET',
+        withCredentials: true,
+      });
+
+      console.log('bankingResponse', bankingResponse);
+    };
+
+    getBankAccountConfig();
+  }, []);
 
   return (
     <>

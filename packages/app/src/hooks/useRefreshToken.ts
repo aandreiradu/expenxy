@@ -1,6 +1,7 @@
 import { useAppDispatch } from '../store/hooks';
 import { setAccessToken, setAuthData } from '../store/User/index.slice';
 import axios from '../api/axios';
+import { useDispatch } from 'react-redux';
 
 type TSuccessRefreshResponse = {
   data: {
@@ -12,13 +13,13 @@ type TSuccessRefreshResponse = {
 type TFailedRefreshResponse = {};
 
 const useRefreshToken = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const refresh = async () => {
     const response = await axios.get<TSuccessRefreshResponse>('/refresh', {
       withCredentials: true,
     });
 
-    console.log('response refresh method from useRefreshToken', response);
+    // console.log('response refresh method from useRefreshToken', response);
     const { accessToken, username } = response.data.data;
 
     console.log('received this from backend', accessToken);

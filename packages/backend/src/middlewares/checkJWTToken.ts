@@ -12,9 +12,9 @@ declare global {
   }
 }
 
-type TDecodedUser = {
+interface TDecodedUser {
   userId: string;
-};
+}
 
 const checkJWTToken = (
   req: Request,

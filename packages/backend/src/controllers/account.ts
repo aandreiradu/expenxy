@@ -7,6 +7,29 @@ import {
   type HasExistingAccountReturn,
 } from '../services/account';
 
+export const getBankingProductsController = async (
+  req: Request,
+  res: Response<IResponse>,
+  next: NextFunction,
+) => {
+  try {
+    const bankingProducts = await BankAccountService.getBankingProducts();
+
+    if (!bankingProducts) {
+      return res.status(200).send({
+        message: 'No banking products found',
+      });
+    }
+
+    return res.status(200).send({
+      message: 'Fetched banking products successfully',
+      data: {
+        bankingProducts: bankingProducts,
+      },
+    });
+  } catch (error) {}
+};
+
 export const createBankAccountController = async (
   req: Request<{}, {}, CreateBankAccountArgs>,
   res: Response<IResponse<HasExistingAccountReturn | { accountId: string }>>,
@@ -37,7 +60,7 @@ export const createBankAccountController = async (
   try {
     const hasExistingAccount = await BankAccountService.hasExistingAccount({
       currency: req.body.currency,
-      type: req.body.accountType,
+      type: req.body.accountTypeId,
       userId: req.metadata.userId as string,
     });
 
@@ -49,24 +72,29 @@ export const createBankAccountController = async (
         data: {
           balance: hasExistingAccount.balance,
           currency: hasExistingAccount.currency,
-          type: hasExistingAccount.type,
+          bankAccountTypeId: hasExistingAccount.bankAccountTypeId,
         },
       });
     }
-    const createdAccount = await BankAccountService.createBankAccount({
+    const createAccount = await BankAccountService.createBankAccount({
       balance: req.body.balance,
       currency: req.body.currency,
-      accountType: req.body.accountType,
+      accountTypeId: req.body.accountTypeId,
       userId: req.metadata.userId as string,
     });
 
-    console.log('createdAccount', createdAccount, 'return to frontend');
-    return res.status(200).send({
-      message: 'Account created',
-      data: {
-        accountId: createdAccount.accountId,
-      },
-    });
+    if (createAccount) {
+      console.log('createdAccount', createAccount, 'return to frontend');
+      return res.status(200).send({
+        message: 'Account created successfully',
+        data: {
+          accountId: createAccount.accountId,
+        },
+      });
+    }
+
+    console.log('reached bottom');
+    throw new Error('Someting went wrong. Please try again later!');
   } catch (error) {
     if (error instanceof Error) {
       console.log('error is instance of error');

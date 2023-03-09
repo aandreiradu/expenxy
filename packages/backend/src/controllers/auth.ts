@@ -114,15 +114,16 @@ export const refreshTokenController = async (
   const jwt: string = req.cookies['EXPENXY_REFRESH_TOKEN'];
   console.log('jwt', jwt);
 
-  res.clearCookie('EXPENXY_REFRESH_TOKEN', {
-    httpOnly: true,
-    sameSite: 'none',
-    secure: true,
-  });
-
   if (!jwt) {
     console.log('no jwt provided');
     const error = new Error('Unauthorized');
+
+    res.clearCookie('EXPENXY_REFRESH_TOKEN', {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
+
     return next(error);
   }
 
@@ -135,6 +136,7 @@ export const refreshTokenController = async (
 
     if (!isTokenValid) {
       // Return 403 Forbidden - cannot decode refresh token;
+      console.log('403 Forbidden from refresh controller');
       return res
         .status(403)
         .clearCookie('EXPENXY_REFRESH_TOKEN', {

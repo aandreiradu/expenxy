@@ -37,7 +37,7 @@ export const currencyAccountTypes = z.enum(['EUR', 'RON'], {
 export const createBankAccountSchema = z
   .object({
     userId: z.string(),
-    accountType: bankAccountTypes,
+    accountTypeId: /*bankAccountTypes*/ z.string().uuid(),
     currency: currencyAccountTypes,
     balance: z.string().default('0'),
   })
@@ -55,32 +55,79 @@ export type CreateBankAccountArgs = z.infer<typeof createBankAccountSchema>;
 
 export type THasExistingAccount = {
   userId: string;
-  type: CreateBankAccountArgs['accountType'];
+  type: CreateBankAccountArgs['accountTypeId'];
   currency: CreateBankAccountArgs['currency'];
 };
 
 export type HasExistingAccountReturn = Pick<
   Account,
-  'balance' | 'currency' | 'type'
+  'balance' | 'currency' | 'bankAccountTypeId'
 >;
 
 interface IAccount {
+  getBankingProducts(): Promise<{ name: string; id: string }[] | null>;
+
   createBankAccount(
     args: CreateBankAccountArgs,
-  ): Promise<{ accountId: string }>;
+  ): Promise<{ accountId: string } | null>;
 
   hasExistingAccount(
     args: THasExistingAccount,
   ): Promise<HasExistingAccountReturn | null>;
+
+  getBankingProductById(
+    id: string,
+  ): Promise<{ id: string; name: string } | undefined>;
 }
 
 export const BankAccountService: IAccount = {
+  async getBankingProducts() {
+    const bankingProducts = await prisma.bankAccountType.findMany({
+      select: {
+        name: true,
+        id: true,
+      },
+    });
+
+    return bankingProducts ?? null;
+  },
+
+  async getBankingProductById(id: string) {
+    const bankingProduct = await prisma.bankAccountType.findFirst({
+      where: {
+        id: id,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    return bankingProduct ?? undefined;
+  },
+
   async createBankAccount(args: CreateBankAccountArgs) {
+    const selectedBankingProduct = await this.getBankingProductById(
+      args.accountTypeId,
+    );
+    console.log('selectedBankingProduct', selectedBankingProduct);
+
+    if (!selectedBankingProduct) {
+      console.log(
+        'couldnt identify the banking product, retun null',
+        selectedBankingProduct,
+      );
+      return null;
+    }
+
+    const { id, name } = selectedBankingProduct;
+    console.log('selectedBankingProduct', selectedBankingProduct);
+
     const bankAccount = await prisma.account.create({
       data: {
         balance: parseFloat(args.balance),
         currency: args.currency,
-        type: args.accountType,
+        bankAccountTypeId: id,
         userId: args.userId,
       },
       select: {
@@ -88,7 +135,11 @@ export const BankAccountService: IAccount = {
       },
     });
 
-    return { accountId: bankAccount.id };
+    if (bankAccount?.id) {
+      return { accountId: bankAccount.id };
+    }
+
+    return null;
   },
 
   async hasExistingAccount(args: THasExistingAccount) {
@@ -97,12 +148,14 @@ export const BankAccountService: IAccount = {
     const existingAccount = await prisma.account.findFirst({
       where: {
         userId: args.userId,
-        type: args.type,
+        bankAccountTypeId: args.type,
+        currency: args.currency,
       },
       select: {
         balance: true,
         currency: true,
-        type: true,
+        bankAccountType: true,
+        bankAccountTypeId: true,
       },
     });
 

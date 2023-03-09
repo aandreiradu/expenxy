@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { forwardRef, useId } from 'react';
 import { ComponentPropsWithoutRef } from 'react';
 import Label from '../Label';
 import { ArrowDown } from 'phosphor-react';
+// import CustomOptionElement from './index.d';
+import { Extended } from './index.d';
+import { useRef } from 'react';
 
 type dataSourceValue = {
-  value: string;
+  value?: string;
+  name?: string;
+  id?: string;
 };
 
 type SelectProps = ComponentPropsWithoutRef<'select'> & {
@@ -43,7 +48,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             {props.placeholder || 'Select'}
           </option>
           {dataSourceGroup.map((source) => (
-            <option key={source.value} id={id} spellCheck="false">
+            <option key={source.value} spellCheck="false" value={source.id}>
               {source.value}
             </option>
           ))}
