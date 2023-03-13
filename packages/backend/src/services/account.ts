@@ -78,6 +78,8 @@ interface IAccount {
   getBankingProductById(
     id: string,
   ): Promise<{ id: string; name: string } | undefined>;
+
+  needsBankAccount(id: string): Promise<boolean>;
 }
 
 export const BankAccountService: IAccount = {
@@ -143,8 +145,6 @@ export const BankAccountService: IAccount = {
   },
 
   async hasExistingAccount(args: THasExistingAccount) {
-    console.log('hasExistingAccount received', args);
-
     const existingAccount = await prisma.account.findFirst({
       where: {
         userId: args.userId,
@@ -164,5 +164,38 @@ export const BankAccountService: IAccount = {
     }
 
     return null;
+  },
+
+  /*
+    Used to count the bank account for a specific User. After Register / Login, if an user does not have a banking account,
+    he will be redirected to create one
+  */
+  async needsBankAccount(id: string) {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: id,
+      },
+      select: {
+        _count: {
+          select: {
+            Account: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      return false;
+    }
+
+    const {
+      _count: { Account: accountNo },
+    } = user;
+
+    if (!accountNo) {
+      return false;
+    }
+
+    return true;
   },
 };

@@ -11,6 +11,7 @@ import {
   setNewPasswordSchema,
 } from '../services/auth';
 import { sendMail } from '../utils/sendMail';
+import { BankAccountService } from '../services/account';
 
 export interface IResponse<T = any> {
   message?: string;
@@ -58,7 +59,13 @@ export const registerController = async (
 
 export const authController = async (
   req: Request<{}, {}, LoginArgs>,
-  res: Response<IResponse<{ username: string; accessToken: string }>>,
+  res: Response<
+    IResponse<{
+      username: string;
+      accessToken: string;
+      existingBankAccounts: boolean;
+    }>
+  >,
   next: NextFunction,
 ) => {
   const validationResult = loginSchema.safeParse(req.body);
@@ -75,9 +82,9 @@ export const authController = async (
   }
 
   try {
-    const { accessToken, username, refreshToken } = await AuthService.login(
-      req.body,
-    );
+    const { accessToken, username, refreshToken, userId } = await AuthService.login(req.body);
+    const existingBankAccounts = await BankAccountService.needsBankAccount(userId);
+    console.log('existingBankAccounts', existingBankAccounts);
 
     res.cookie('EXPENXY_REFRESH_TOKEN', refreshToken, {
       sameSite: 'none',
@@ -90,6 +97,7 @@ export const authController = async (
       data: {
         accessToken,
         username,
+        existingBankAccounts,
       },
     });
   } catch (error) {
@@ -201,8 +209,7 @@ export const generateTokenResetPassword = async (
   }
 
   try {
-    const { resetToken, resetTokenExpiration } =
-      await AuthService.generateTokenResetPw(req.body.email);
+    const { resetToken, resetTokenExpiration } = await AuthService.generateTokenResetPw(req.body.email);
 
     if (resetToken && resetTokenExpiration) {
       const mailResponse = await sendMail(
@@ -230,11 +237,7 @@ export const generateTokenResetPassword = async (
   }
 };
 
-export const checkResetTokenValidity = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const checkResetTokenValidity = async (req: Request, res: Response, next: NextFunction) => {
   const { token } = req.params;
 
   try {
@@ -246,9 +249,7 @@ export const checkResetTokenValidity = async (
     const isTokenValid = await AuthService.checkResetPasswordToken(token);
 
     if (!isTokenValid) {
-      const error = new Error(
-        'No account found based on generated token or token is expired',
-      );
+      const error = new Error('No account found based on generated token or token is expired');
       return next(error);
     }
 
@@ -306,11 +307,7 @@ export const setNewPassword = async (
   }
 };
 
-export const logOut = async (
-  req: Request,
-  res: Response<IResponse>,
-  next: NextFunction,
-) => {
+export const logOut = async (req: Request, res: Response<IResponse>, next: NextFunction) => {
   console.log('cookies', req.cookies);
   const { EXPENXY_REFRESH_TOKEN } = req.cookies;
 

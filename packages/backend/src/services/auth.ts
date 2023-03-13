@@ -67,7 +67,12 @@ interface IAuthService {
 
   login(
     args: LoginArgs,
-  ): Promise<{ accessToken: string; username: string; refreshToken: string }>;
+  ): Promise<{
+    accessToken: string;
+    username: string;
+    refreshToken: string;
+    userId: string;
+  }>;
 
   checkToken(args: CheckTokenArgs): boolean;
 
@@ -140,6 +145,11 @@ export const AuthService: IAuthService = {
           },
         ],
       },
+      select: {
+        id: true,
+        password: true,
+        username: true,
+      },
     });
 
     if (!user) {
@@ -178,6 +188,7 @@ export const AuthService: IAuthService = {
       accessToken: accessToken,
       refreshToken: refreshToken,
       username: user.username,
+      userId: user.id,
     };
   },
   async getUserByRefreshToken(refreshToken: string) {

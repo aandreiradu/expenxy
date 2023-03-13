@@ -27,7 +27,20 @@ export const getBankingProductsController = async (
         bankingProducts: bankingProducts,
       },
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log('error getBankingProductsController', error);
+    if (error instanceof Error) {
+      console.log('error is instance of error');
+      console.log({
+        message: error.message,
+        name: error.name,
+      });
+
+      return next(error.message);
+    }
+
+    return next('Something went wrong, please try again later!');
+  }
 };
 
 export const createBankAccountController = async (
@@ -108,4 +121,49 @@ export const createBankAccountController = async (
 
     return next('Something went wrong, please try again later!');
   }
+};
+
+export const checkBankAccountExisting = async (
+  req: Request<{}, {}, { accountId: string }>,
+  res: Response<IResponse>,
+  next: NextFunction,
+) => {
+  const { accountId } = req.body;
+
+  try {
+    const needsBankAccount = await BankAccountService.needsBankAccount(
+      accountId,
+    );
+    return res.status(200).send({
+      data: {
+        needsBankAccount,
+      },
+    });
+  } catch (error) {
+    console.log('error checkBankAccountExisting', error);
+    if (error instanceof Error) {
+      return next({
+        error: {
+          message: error.message,
+        },
+      });
+    }
+
+    return next('Something went wrong, please try again later!');
+  }
+};
+
+export const test = async (
+  req: Request<{}, {}, { id: string }>,
+  res: Response<IResponse>,
+  next: NextFunction,
+) => {
+  const { id } = req.body;
+
+  const serviceResponse = await BankAccountService.needsBankAccount(id);
+  return res.status(200).send({
+    data: {
+      serviceResponse,
+    },
+  });
 };
