@@ -72,11 +72,17 @@ const Login = () => {
     });
 
     if (response?.data) {
-      const { accessToken, username } = response.data;
+      const { accessToken, username, existingBankAccounts } = response.data;
+      console.log('existingBankAccounts', existingBankAccounts);
 
       if (accessToken && username) {
         dispatch(setAuthData({ accessToken: accessToken, username: username }));
-        navigate('/create-banking-account');
+
+        if (!existingBankAccounts) {
+          return navigate('/create-bank-account');
+        }
+
+        return navigate('/');
       }
     }
   };

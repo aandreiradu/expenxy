@@ -7,6 +7,7 @@ import {
   Gear,
   SignOut,
   Plus,
+  Bank,
 } from 'phosphor-react';
 import SidebarLink from './SidebarLink';
 import type { SidebarLinkProps } from './SidebarLink';
@@ -31,6 +32,14 @@ export const sidebarNavigation: SidebarLinkProps[] = [
     href: '/add-transaction',
     icon: <Plus className={sidebarIconClasses} />,
     name: 'AddTransaction',
+    setShowComponent: () => {},
+    isLink: false,
+  },
+  {
+    isLink: true,
+    href: '/create-bank-account',
+    icon: <Bank className={sidebarIconClasses} />,
+    name: 'Create Bank Account',
     setShowComponent: () => {},
   },
   {
@@ -146,6 +155,7 @@ const Sidebar = ({ setShowComponent }: ISidebarProps) => {
               icon={si.icon}
               setShowComponent={setShowComponent}
               name={si.name}
+              isLink={si.isLink}
             />
           ))}
         </div>

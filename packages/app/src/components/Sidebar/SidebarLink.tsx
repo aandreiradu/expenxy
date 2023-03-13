@@ -1,4 +1,5 @@
 import { Dispatch, FC, ReactNode, SetStateAction, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TShowComponent } from '../../pages/Home';
 
 export interface SidebarLinkProps {
@@ -7,6 +8,7 @@ export interface SidebarLinkProps {
   setShowComponent?: Dispatch<SetStateAction<TShowComponent>>;
   name: string;
   className?: string;
+  isLink?: boolean;
 }
 
 const SidebarLink: FC<SidebarLinkProps> = ({
@@ -15,14 +17,27 @@ const SidebarLink: FC<SidebarLinkProps> = ({
   setShowComponent,
   name,
   className,
+  isLink = false,
 }) => {
+  const navigate = useNavigate();
+
   const clickHandler = () => {
-    if (setShowComponent) {
-      setShowComponent({
-        show: true,
-        componentName: name,
-      });
+    if (isLink) {
+      console.log({ isLink, name });
     }
+
+    if (!isLink) {
+      console.log('nu este link');
+      if (setShowComponent) {
+        return setShowComponent({
+          show: true,
+          componentName: name,
+        });
+      }
+    }
+
+    console.log('este link,navigate to', href);
+    navigate(`${href}`);
   };
 
   return (

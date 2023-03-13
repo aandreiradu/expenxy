@@ -9,6 +9,9 @@ import { useHttpRequest } from '../../hooks/useHttp';
 import { useEffect, useState } from 'react';
 import Modal from '../../components/UI/Modal';
 import { PulseLoader } from 'react-spinners';
+import statsAndMaps from '../../config/statusAndMessagesMap';
+import { Check } from 'phosphor-react';
+import TopLevelNotification from '../../components/UI/TopLevelNotification';
 
 const title = 'Your Finances In One Place';
 const description =
@@ -34,6 +37,11 @@ const Register = () => {
     resolver: zodResolver(registerSchema),
     mode: 'onSubmit',
   });
+  const [topLevelNotification, setTopLevelNotification] = useState({
+    show: false,
+    message: '',
+    icon: <></>,
+  });
 
   const onSubmit: SubmitHandler<RegisterProps> = async (data) => {
     console.log('data', data);
@@ -51,8 +59,19 @@ const Register = () => {
 
     if (response?.data) {
       const { message } = response.data;
-      if (message === 'Account created') {
-        navigate('/login');
+      if (message === statsAndMaps['accountCreatedSuccessfully']?.message) {
+        const frontendMessage =
+          statsAndMaps['accountCreatedSuccessfully']?.frontendMessage;
+        frontendMessage &&
+          setTopLevelNotification({
+            show: true,
+            message: frontendMessage,
+            icon: <Check className="w-14 h-8 text-green-400" />,
+          });
+
+        setTimeout(() => {
+          return navigate('/login');
+        }, 5500);
       }
     }
   };
@@ -82,12 +101,31 @@ const Register = () => {
 
   return (
     <AuthLayout title={title} description={description}>
+      {/* Show Error Modal */}
       {error && showModal && (
         <Modal
           onConfirm={setShowModal}
           show={showModal}
           title={'Ooops'}
           message={error.message}
+        />
+      )}
+
+      {/* Shop Top Level Notification */}
+      {topLevelNotification.show && (
+        <TopLevelNotification
+          hasCloseButton={false}
+          dismissAfterXMs={5500}
+          message={topLevelNotification.message}
+          show={topLevelNotification.show}
+          onClose={() =>
+            setTopLevelNotification({
+              show: false,
+              message: '',
+              icon: <></>,
+            })
+          }
+          icon={topLevelNotification.icon}
         />
       )}
 
@@ -165,7 +203,6 @@ const Register = () => {
           Forgot your password
         </span>
         <button
-          disabled={Object.keys(errors).length > 0}
           form="register"
           className="disabled:cursor-not-allowed disabled:pointer-events-none w-full bg-[#1f1f1f] mt-7 p-3 rounded-md text-lg uppercase hover:bg-white hover:text-[#1f1f1f] focus:bg-white focus:text-[#1f1f1f] focus:outline-none transition-all duration-100 ease-in"
         >

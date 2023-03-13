@@ -21,7 +21,7 @@ function App() {
         <Route element={<Persist />}>
           <Route path="/" element={<Home />} />
           <Route
-            path="/create-banking-account"
+            path="/create-bank-account"
             element={<CreateBankAccountLayouts title="Create bank account" />}
           />
         </Route>

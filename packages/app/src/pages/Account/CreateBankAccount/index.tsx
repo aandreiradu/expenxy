@@ -6,7 +6,7 @@ import { Select } from '../../../components/Select';
 import { createBankAccountSchema, type CreateBankAcountProps } from './schema';
 import { PropagateLoader } from 'react-spinners';
 import { Warning, Timer, Check } from 'phosphor-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useHttpRequest } from '../../../hooks/useHttp';
 import statsAndMaps from '../../../config/statusAndMessagesMap';
 import TopLevelNotification from '../../../components/UI/TopLevelNotification';
@@ -28,13 +28,14 @@ export interface BankingProductsRes {
 }
 
 const currencyTypes = [{ value: 'EUR' }, { value: 'RON' }];
-const bankAccountTypes = [
-  { value: 'Bank Account' },
-  { value: 'Savings' },
-  { value: 'Morgage' },
-];
 
 const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
+  const [topLevelNotification, setTopLevelNotification] = useState({
+    show: false,
+    message: '',
+    icon: <></>,
+  });
+  const [showModal, setShowModal] = useState(false);
   const [bankingProducts, setBankingProducts] = useState<
     | [
         {
@@ -45,68 +46,18 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
       ]
     | []
   >([]);
-  const [topLevelNotification, setTopLevelNotification] = useState({
-    show: false,
-    message: '',
-    icon: <></>,
-  });
+
   const {
     formState: { errors },
     register,
     handleSubmit,
+    reset,
   } = useForm<CreateBankAcountProps>({
     resolver: zodResolver(createBankAccountSchema),
     mode: 'onSubmit',
   });
   const { error, isLoading, sendRequest } = useHttpRequest();
-
-  const onSubmit: SubmitHandler<CreateBankAcountProps> = async (data) => {
-    console.log('data', data);
-
-    const createBankAccResponse = await sendRequest({
-      method: 'POST',
-      url: '/createBankAccount',
-      withCredentials: true,
-      body: {
-        accountName: data.accountName,
-        currency: data.currency,
-        balance: data.balance,
-        accountTypeId: data.accountType,
-      },
-    });
-
-    if (createBankAccResponse && createBankAccResponse?.data) {
-      console.log('createResponse', createBankAccResponse);
-      const { balance, currency, type } = createBankAccResponse.data;
-      const { message, status } = createBankAccResponse;
-
-      if (
-        status === statsAndMaps['existingBankAccountFound']?.status &&
-        message === statsAndMaps['existingBankAccountFound'].message
-      ) {
-        const { frontendMessage } = statsAndMaps['existingBankAccountFound'];
-        if (frontendMessage) {
-          setTopLevelNotification({
-            show: true,
-            message: frontendMessage,
-            icon: <Warning className="w-14 h-8 text-yellow-400" />,
-          });
-        }
-      } else if (
-        status === statsAndMaps['accountCreatedSuccessfully']?.status &&
-        message === statsAndMaps['accountCreatedSuccessfully'].message
-      ) {
-        const { frontendMessage } = statsAndMaps['accountCreatedSuccessfully'];
-        if (frontendMessage) {
-          setTopLevelNotification({
-            show: true,
-            message: frontendMessage,
-            icon: <Check className="w-14 h-8 text-green-400" />,
-          });
-        }
-      }
-    }
-  };
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getBankAccountConfig = async () => {
@@ -172,6 +123,64 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
 
     storeBankingProducts();
   }, []);
+
+  useEffect(() => {
+    if (error) {
+      console.log('error effect running', error);
+      const { message, fieldErrors } = error;
+    }
+  }, [error]);
+
+  const onSubmit: SubmitHandler<CreateBankAcountProps> = async (data) => {
+    console.log('data', data);
+
+    const createBankAccResponse = await sendRequest({
+      method: 'POST',
+      url: '/createBankAccount',
+      withCredentials: true,
+      body: {
+        accountName: data.accountName,
+        currency: data.currency,
+        balance: data.balance,
+        accountTypeId: data.accountType,
+      },
+    });
+
+    if (createBankAccResponse && createBankAccResponse?.data) {
+      const { message, status } = createBankAccResponse;
+
+      if (
+        status === statsAndMaps['existingBankAccountFound']?.status &&
+        message === statsAndMaps['existingBankAccountFound'].message
+      ) {
+        const { frontendMessage } = statsAndMaps['existingBankAccountFound'];
+        if (frontendMessage) {
+          setTopLevelNotification({
+            show: true,
+            message: frontendMessage,
+            icon: <Warning className="w-14 h-8 text-yellow-400" />,
+          });
+        }
+      } else if (
+        status === statsAndMaps['bankAccountCreatedSuccessfully']?.status &&
+        message === statsAndMaps['bankAccountCreatedSuccessfully'].message
+      ) {
+        const { frontendMessage } =
+          statsAndMaps['bankAccountCreatedSuccessfully'];
+        if (frontendMessage) {
+          setTimeout(() => {
+            navigate('/');
+          }, 5600);
+          setTopLevelNotification({
+            show: true,
+            message: frontendMessage,
+            icon: <Check className="w-14 h-8 text-green-400" />,
+          });
+        }
+        reset();
+      }
+    }
+  };
 
   return (
     <>
