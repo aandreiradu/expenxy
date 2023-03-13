@@ -122,6 +122,24 @@ const Register = () => {
         />
       )}
 
+      {/* Shop Top Level Notification */}
+      {topLevelNotification.show && (
+        <TopLevelNotification
+          hasCloseButton={false}
+          dismissAfterXMs={5500}
+          message={topLevelNotification.message}
+          show={topLevelNotification.show}
+          onClose={() =>
+            setTopLevelNotification({
+              show: false,
+              message: '',
+              icon: <></>,
+            })
+          }
+          icon={topLevelNotification.icon}
+        />
+      )}
+
       <h1 className="text-3xl  font-bold">Welcome to EXPENXY</h1>
       <span className="text-base  py-2">Register your account</span>
       <form id="register" onSubmit={handleSubmit(onSubmit)} className="flex flex-col  space-y-10 w-full mt-3">

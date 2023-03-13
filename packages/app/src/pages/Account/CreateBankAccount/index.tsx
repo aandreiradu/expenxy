@@ -30,6 +30,12 @@ export interface BankingProductsRes {
 const currencyTypes = [{ value: 'EUR' }, { value: 'RON' }];
 
 const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
+  const [topLevelNotification, setTopLevelNotification] = useState({
+    show: false,
+    message: '',
+    icon: <></>,
+  });
+  const [showModal, setShowModal] = useState(false);
   const [bankingProducts, setBankingProducts] = useState<
     | [
         {

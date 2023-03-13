@@ -10,11 +10,8 @@ type ExistingBackendMessage =
   | 'testingKeys'
   | 'fetchedBankingProductsSuccess'
   | 'fetchBankingProductsEmpty'
+  | 'bankAccountCreatedSuccessfully'
   | 'accountCreatedSuccessfully';
-
-// type IStatsAndMessages = {
-//   [K in ExistingBackendMessage]?: (data: string[]) => {};
-// };
 
 type IStatsAndMessages = {
   [K in ExistingBackendMessage]?: {
@@ -56,10 +53,10 @@ const statsAndMaps: IStatsAndMessages = {
     message: 'No banking products found',
     status: 200,
   },
-  accountCreatedSuccessfully: {
+  bankAccountCreatedSuccessfully: {
     message: 'Account created successfully',
     status: 200,
-    frontendMessage: 'Account has been created successfully',
+    frontendMessage: 'Your Bank Account has been created successfully',
   },
 };
 
