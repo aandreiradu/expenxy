@@ -128,6 +128,10 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
     if (error) {
       console.log('error effect running', error);
       const { message, fieldErrors } = error;
+
+      /*
+        !!! TODO: Error handle here 
+      */
     }
   }, [error]);
 

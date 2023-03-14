@@ -14,8 +14,7 @@ import { Check } from 'phosphor-react';
 import TopLevelNotification from '../../components/UI/TopLevelNotification';
 
 const title = 'Your Finances In One Place';
-const description =
-  'Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati, fuga!';
+const description = 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati, fuga!';
 
 type ValidationErrors = {
   username: 'username';
@@ -33,6 +32,7 @@ const Register = () => {
     handleSubmit,
     formState: { errors },
     setError,
+    reset,
   } = useForm<RegisterProps>({
     resolver: zodResolver(registerSchema),
     mode: 'onSubmit',
@@ -60,8 +60,7 @@ const Register = () => {
     if (response?.data) {
       const { message } = response.data;
       if (message === statsAndMaps['accountCreatedSuccessfully']?.message) {
-        const frontendMessage =
-          statsAndMaps['accountCreatedSuccessfully']?.frontendMessage;
+        const frontendMessage = statsAndMaps['accountCreatedSuccessfully']?.frontendMessage;
         frontendMessage &&
           setTopLevelNotification({
             show: true,
@@ -69,6 +68,7 @@ const Register = () => {
             icon: <Check className="w-14 h-8 text-green-400" />,
           });
 
+        reset();
         setTimeout(() => {
           return navigate('/login');
         }, 5500);
@@ -102,14 +102,7 @@ const Register = () => {
   return (
     <AuthLayout title={title} description={description}>
       {/* Show Error Modal */}
-      {error && showModal && (
-        <Modal
-          onConfirm={setShowModal}
-          show={showModal}
-          title={'Ooops'}
-          message={error.message}
-        />
-      )}
+      {error && showModal && <Modal onConfirm={setShowModal} show={showModal} title={'Ooops'} message={error.message} />}
 
       {/* Shop Top Level Notification */}
       {topLevelNotification.show && (
@@ -131,11 +124,7 @@ const Register = () => {
 
       <h1 className="text-3xl  font-bold">Welcome to EXPENXY</h1>
       <span className="text-base  py-2">Register your account</span>
-      <form
-        id="register"
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col  space-y-10 w-full mt-3"
-      >
+      <form id="register" onSubmit={handleSubmit(onSubmit)} className="flex flex-col  space-y-10 w-full mt-3">
         <div className="relative z-0">
           <Input
             id="username"
@@ -199,9 +188,7 @@ const Register = () => {
             required
           />
         </div>
-        <span className="text-sm ml-auto text-yellow-500 mt-6 cursor-pointer">
-          Forgot your password
-        </span>
+        <span className="text-sm ml-auto text-yellow-500 mt-6 cursor-pointer">Forgot your password</span>
         <button
           form="register"
           className="disabled:cursor-not-allowed disabled:pointer-events-none w-full bg-[#1f1f1f] mt-7 p-3 rounded-md text-lg uppercase hover:bg-white hover:text-[#1f1f1f] focus:bg-white focus:text-[#1f1f1f] focus:outline-none transition-all duration-100 ease-in"
