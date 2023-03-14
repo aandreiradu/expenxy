@@ -21,14 +21,15 @@ model User {
 }
 
 model Account {
-  id       String @id @default(uuid())
-  userId   String
-  type     String
-  currency String
-  balance  Int
+  id              String            @id @default(uuid())
+  userId          String
+  bankAccountType BankAccountType[]
+  currency        String
+  balance         Int
 
-  user         User           @relation(fields: [userId], references: [id])
-  Transactions Transactions[]
+  user              User           @relation(fields: [userId], references: [id])
+  Transactions      Transactions[]
+  bankAccountTypeId String
 }
 
 model Transactions {
@@ -46,4 +47,17 @@ model Currency {
   name   String @unique
   code   String @unique
   symbol String @unique
+}
+
+model BankAccountType {
+  id        String   @id @default(uuid())
+  name      String
+  Account   Account? @relation(fields: [accountId], references: [id])
+  accountId String?
+}
+
+model EXPENXY_CUSTOM_CONFIG {
+  id         String @id @default(uuid())
+  name       String @unique
+  configJSON Json
 }

@@ -43,9 +43,9 @@ export const setNewPasswordSchema = z
 
 export type CreateUserArgs = z.infer<typeof createUserSchema>;
 export type LoginArgs = z.infer<typeof loginSchema>;
-export type GetUserByRTArgs = {
-  refreshToken: string;
-};
+// export type GetUserByRTArgs = {
+//   refreshToken: string;
+// };
 export type CheckTokenArgs = {
   type: 'refresh' | 'access';
   token: string;
@@ -67,7 +67,12 @@ interface IAuthService {
 
   login(
     args: LoginArgs,
-  ): Promise<{ accessToken: string; username: string; refreshToken: string }>;
+  ): Promise<{
+    accessToken: string;
+    username: string;
+    refreshToken: string;
+    userId: string;
+  }>;
 
   checkToken(args: CheckTokenArgs): boolean;
 
@@ -78,7 +83,7 @@ interface IAuthService {
   ): Promise<{ accessToken: string; refreshToken: string } | void>;
 
   getUserByRefreshToken(
-    args: GetUserByRTArgs,
+    refreshToken: string,
   ): Promise<{ userId: string; username: string }>;
 
   generateTokenResetPw(
@@ -88,6 +93,10 @@ interface IAuthService {
   checkResetPasswordToken(token: string): Promise<boolean>;
 
   setNewPassword(password: string, resetToken: string): Promise<boolean>;
+
+  logout(refreshToken: string): Promise<void>;
+
+  getUserById(userId: string): Promise<any>;
 }
 
 export const AuthService: IAuthService = {
@@ -125,7 +134,6 @@ export const AuthService: IAuthService = {
   },
 
   async login(params: LoginArgs) {
-    console.log('searching user in db for', params);
     const user = await prisma.user.findFirst({
       where: {
         OR: [
@@ -136,6 +144,11 @@ export const AuthService: IAuthService = {
             email: params.usernameOrEmail,
           },
         ],
+      },
+      select: {
+        id: true,
+        password: true,
+        username: true,
       },
     });
 
@@ -150,13 +163,13 @@ export const AuthService: IAuthService = {
 
     const accessToken = jwt.sign(
       {
-        username: params.usernameOrEmail,
+        userId: user.id,
       },
       process.env.EXPENXY_LOGIN_ACCESS_SECRET!,
     );
     const refreshToken = jwt.sign(
       {
-        username: params.usernameOrEmail,
+        userId: user.id,
       },
       process.env.EXPENXY_LOGIN_REFRESH_SECRET!,
     );
@@ -175,12 +188,13 @@ export const AuthService: IAuthService = {
       accessToken: accessToken,
       refreshToken: refreshToken,
       username: user.username,
+      userId: user.id,
     };
   },
-  async getUserByRefreshToken(params: GetUserByRTArgs) {
+  async getUserByRefreshToken(refreshToken: string) {
     const user = await prisma.user.findFirst({
       where: {
-        refreshToken: params.refreshToken,
+        refreshToken: refreshToken,
       },
     });
 
@@ -225,7 +239,7 @@ export const AuthService: IAuthService = {
     )!;
 
     try {
-      const token = jwt.sign({ username: params.username }, type, {
+      const token = jwt.sign({ userId: params.userId }, type, {
         expiresIn: '1d',
       });
 
@@ -258,14 +272,14 @@ export const AuthService: IAuthService = {
     try {
       const accessToken = jwt.sign(
         {
-          username: params.username,
+          userId: params.userId,
         },
         process.env.EXPENXY_LOGIN_ACCESS_SECRET!,
       );
 
       const refreshToken = jwt.sign(
         {
-          username: params.username,
+          userId: params.userId,
         },
         process.env.EXPENXY_LOGIN_REFRESH_SECRET!,
       );
@@ -397,47 +411,41 @@ export const AuthService: IAuthService = {
 
     return true;
   },
+
+  async logout(refreshToken: string) {
+    const user = await prisma.user.findFirst({
+      where: {
+        refreshToken,
+      },
+      select: {
+        id: true,
+        refreshToken: true,
+      },
+    });
+
+    if (user?.refreshToken) {
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          refreshToken: '',
+          accessToken: '',
+        },
+      });
+    }
+  },
+
+  async getUserById(userId: string) {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return user?.id;
+  },
 };
-
-/*
-{
-  "error": {
-    "message": "Error validation",
-    "fieldErrors": {
-      "password": [
-        "Password should contain at least 6 characters"
-      ],
-      "confirmPassword": [
-        "Password should contain at least 6 characters",
-        "Passwords don't match"
-      ]
-    }
-  }
-
-
-{
-  "error": {
-    "message": "Error validation",
-    "fieldErrors": {
-      "confirmPassword": [
-        "Passwords don't match"
-      ]
-    }
-  }
-}
-
-}
-
-
-{
-  "error": {
-    "message": "Error validation",
-    "fieldErrors": {
-      "token": [
-        "Required"
-      ]
-    }
-  }
-}
-
-*/

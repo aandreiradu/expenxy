@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import {
-  registerController,
   authController,
-  refreshTokenController,
-  generateTokenResetPassword,
   checkResetTokenValidity,
-  setNewPassword,
+  generateTokenResetPassword,
   logOut,
-} from './controllers/auth';
-import { createTransactionController } from './controllers/transactions';
+  refreshTokenController,
+  registerController,
+  setNewPassword,
+} from '../../controllers/auth';
+import { createTransactionController } from '../../controllers/transactions';
 
 const router = Router();
 

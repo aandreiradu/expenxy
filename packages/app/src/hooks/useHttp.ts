@@ -1,99 +1,7 @@
-import axios, {
-  AxiosInstance,
-  AxiosResponse,
-  InternalAxiosRequestConfig,
-} from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { useCallback, useReducer } from 'react';
 import { Reducer } from 'react';
 import useAxiosInterceptors from './useAxiosInterceptors';
-
-interface GetArgs {
-  url: string;
-  queryParams?: { [key: string]: string };
-  accessToken?: string;
-}
-
-interface PostArgs<T = undefined> {
-  url: string;
-  body?: T;
-  accessToken?: string;
-}
-
-interface DeleteArgs {
-  url: string;
-  accessToken?: string;
-}
-
-export const get = async <T>(
-  args: GetArgs,
-): Promise<{ data: T; status: number }> => {
-  const { accessToken } = args;
-
-  const requestUrl = new URL(args.url);
-  const url = requestUrl.href;
-
-  try {
-    const { data, status } = await axios.get<T>(url, {
-      headers: accessToken
-        ? {
-            Authorization: `EXPENXY ${accessToken}`,
-          }
-        : {},
-      params: args.queryParams ? args.queryParams : '',
-    });
-
-    return { data, status };
-  } catch (error) {
-    console.log(error);
-    throw new Error('Error GET');
-  }
-};
-
-export const post = async <TRequest, TResponse>(
-  args: PostArgs<TRequest>,
-): Promise<TResponse> => {
-  const { accessToken, body } = args;
-
-  const requestUrl = new URL(args.url);
-  const url = requestUrl.href;
-
-  try {
-    const { data, status } = await axios.post<TResponse>(url, body, {
-      headers: accessToken
-        ? {
-            Authorization: `EXPENXY ${accessToken}`,
-          }
-        : {},
-    });
-
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw new Error('Error POST');
-  }
-};
-
-export const deleteRequest = async <TResponse>(
-  args: DeleteArgs,
-): Promise<void> => {
-  const { accessToken } = args;
-
-  const requestUrl = new URL(args.url);
-  const url = requestUrl.href;
-
-  try {
-    const { data, status } = await axios.delete<TResponse>(url, {
-      headers: accessToken
-        ? {
-            Authorization: `EXPENXY ${accessToken}`,
-          }
-        : {},
-    });
-  } catch (error) {
-    console.log(error);
-    throw new Error('Error Delete');
-  }
-};
 
 interface IRequestConfig {
   url: string;
@@ -114,6 +22,11 @@ interface IState {
     data?: string[];
     status?: number;
   };
+}
+
+interface CustomAxiosResponse extends AxiosResponse {
+  message?: string;
+  status: number;
 }
 
 enum ActionTypes {
@@ -140,7 +53,6 @@ const initialState: IState = {
 };
 
 const apiReducer = (state: IState, action: IAction): any => {
-  console.log('useAxiosInterceptors received', state, action);
   const { payload, type } = action;
 
   switch (type) {
@@ -174,7 +86,7 @@ export const useHttpRequest = () => {
   );
 
   const sendRequest = useCallback(
-    async (config: IRequestConfig): Promise<AxiosResponse | void> => {
+    async (config: IRequestConfig): Promise<CustomAxiosResponse | void> => {
       const { body, headers, method, url, withCredentials } = config;
 
       try {
@@ -187,21 +99,19 @@ export const useHttpRequest = () => {
           withCredentials: withCredentials ? withCredentials : false,
         });
 
-        console.log('response hook', response);
-
         // setTimeout(() => {
         dispatch({
           type: ActionTypes.RESPONSE,
           payload: response.data,
         });
-        // }, 10000);
+        // }, 5000);
 
+        response.data.status = response.status;
         return response.data;
       } catch (error) {
         const customError: any = error;
-        console.log('error useHttpRequest', customError.response);
+        console.log('error useHttp', error);
 
-        // setTimeout(() => {
         dispatch({
           type: ActionTypes.ERROR,
           payload: {
@@ -210,7 +120,6 @@ export const useHttpRequest = () => {
             ...customError?.response.data.error,
           },
         });
-        // }, 10000);
       }
     },
     [],

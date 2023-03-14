@@ -1,4 +1,3 @@
-import { prisma } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import {
   createUserSchema,
@@ -12,8 +11,9 @@ import {
   setNewPasswordSchema,
 } from '../services/auth';
 import { sendMail } from '../utils/sendMail';
+import { BankAccountService } from '../services/account';
 
-interface IResponse<T = any> {
+export interface IResponse<T = any> {
   message?: string;
   data?: T;
   error?: {
@@ -59,10 +59,15 @@ export const registerController = async (
 
 export const authController = async (
   req: Request<{}, {}, LoginArgs>,
-  res: Response<IResponse<{ username: string; accessToken: string }>>,
+  res: Response<
+    IResponse<{
+      username: string;
+      accessToken: string;
+      existingBankAccounts: boolean;
+    }>
+  >,
   next: NextFunction,
 ) => {
-  console.log('hited from auth controller wtih', req.body);
   const validationResult = loginSchema.safeParse(req.body);
 
   if (!validationResult.success) {
@@ -77,9 +82,9 @@ export const authController = async (
   }
 
   try {
-    const { accessToken, username, refreshToken } = await AuthService.login(
-      req.body,
-    );
+    const { accessToken, username, refreshToken, userId } = await AuthService.login(req.body);
+    const existingBankAccounts = await BankAccountService.needsBankAccount(userId);
+    console.log('existingBankAccounts', existingBankAccounts);
 
     res.cookie('EXPENXY_REFRESH_TOKEN', refreshToken, {
       sameSite: 'none',
@@ -92,41 +97,46 @@ export const authController = async (
       data: {
         accessToken,
         username,
+        existingBankAccounts,
       },
     });
   } catch (error) {
+    console.log('error authController', error);
     res.clearCookie('jwt', {
       httpOnly: true,
       sameSite: 'none',
       secure: true,
     });
+
+    // return next({ message: 'Something went wrong. Please try again later' });
     return next(error);
   }
 };
 
 export const refreshTokenController = async (
   req: Request,
-  res: Response<IResponse<{ accessToken: string }>>,
+  res: Response<IResponse<{ accessToken: string; username: string }>>,
   next: NextFunction,
 ) => {
   console.log('hited refreshTokenController', req.body, req.cookies);
   const jwt: string = req.cookies['EXPENXY_REFRESH_TOKEN'];
   console.log('jwt', jwt);
 
-  res.clearCookie('EXPENXY_REFRESH_TOKEN', {
-    httpOnly: true,
-    sameSite: 'none',
-    secure: true,
-  });
-
   if (!jwt) {
     console.log('no jwt provided');
     const error = new Error('Unauthorized');
+
+    res.clearCookie('EXPENXY_REFRESH_TOKEN', {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
+
     return next(error);
   }
 
   try {
-    const user = await AuthService.getUserByRefreshToken({ refreshToken: jwt });
+    const user = await AuthService.getUserByRefreshToken(jwt);
     const isTokenValid = AuthService.checkToken({
       type: 'refresh',
       token: jwt,
@@ -134,6 +144,7 @@ export const refreshTokenController = async (
 
     if (!isTokenValid) {
       // Return 403 Forbidden - cannot decode refresh token;
+      console.log('403 Forbidden from refresh controller');
       return res
         .status(403)
         .clearCookie('EXPENXY_REFRESH_TOKEN', {
@@ -164,11 +175,10 @@ export const refreshTokenController = async (
         maxAge: 24 * 60 * 60 * 1000,
       });
 
-      console.log('stop refresh token');
-
       return res.status(201).send({
         data: {
           accessToken,
+          username: user.username,
         },
         message: 'Generated new refresh token successfully',
       });
@@ -185,11 +195,9 @@ export const generateTokenResetPassword = async (
   next: NextFunction,
 ) => {
   const schemaValidation = resetPasswordSchema.safeParse(req.body);
-  console.log('schemaValidation', schemaValidation);
 
   if (!schemaValidation.success) {
     const formattedError = schemaValidation.error.flatten();
-    console.log('formattedError', formattedError);
 
     const error = {
       message: 'Error validation',
@@ -197,13 +205,11 @@ export const generateTokenResetPassword = async (
         fieldErrors: formattedError.fieldErrors,
       },
     };
-    console.log('error to return', error);
     return next(error);
   }
 
   try {
-    const { resetToken, resetTokenExpiration } =
-      await AuthService.generateTokenResetPw(req.body.email);
+    const { resetToken, resetTokenExpiration } = await AuthService.generateTokenResetPw(req.body.email);
 
     if (resetToken && resetTokenExpiration) {
       const mailResponse = await sendMail(
@@ -213,8 +219,6 @@ export const generateTokenResetPassword = async (
         },
         resetToken,
       );
-
-      console.log('mailResponse', mailResponse);
 
       return res.status(201).send({
         message: 'Token generated',
@@ -233,11 +237,7 @@ export const generateTokenResetPassword = async (
   }
 };
 
-export const checkResetTokenValidity = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const checkResetTokenValidity = async (req: Request, res: Response, next: NextFunction) => {
   const { token } = req.params;
 
   try {
@@ -248,12 +248,8 @@ export const checkResetTokenValidity = async (
 
     const isTokenValid = await AuthService.checkResetPasswordToken(token);
 
-    console.log('isTokenValid', isTokenValid);
-
     if (!isTokenValid) {
-      const error = new Error(
-        'No account found based on generated token or token is expired',
-      );
+      const error = new Error('No account found based on generated token or token is expired');
       return next(error);
     }
 
@@ -282,11 +278,8 @@ export const setNewPassword = async (
 
   const validateReqBody = setNewPasswordSchema.safeParse(req.body);
 
-  console.log('validateReqBody', validateReqBody);
-
   if (!validateReqBody.success) {
     const flatten = validateReqBody.error.flatten();
-    console.log('flatten', flatten);
     return res.status(400).send({
       error: {
         message: 'Error validation',
@@ -297,7 +290,6 @@ export const setNewPassword = async (
 
   try {
     const checkedAndUpdated = await AuthService.setNewPassword(password, token);
-    console.log('checkedAndUpdated response', checkedAndUpdated);
     if (!checkedAndUpdated) {
       return res.status(400).send({
         message: 'Something went wrong, please try again later',
@@ -312,5 +304,34 @@ export const setNewPassword = async (
   } catch (error) {
     console.log('ERROR setNewPassword', error);
     next(error);
+  }
+};
+
+export const logOut = async (req: Request, res: Response<IResponse>, next: NextFunction) => {
+  console.log('cookies', req.cookies);
+  const { EXPENXY_REFRESH_TOKEN } = req.cookies;
+
+  if (!EXPENXY_REFRESH_TOKEN) {
+    return res.status(204).send();
+  }
+
+  try {
+    await AuthService.logout(EXPENXY_REFRESH_TOKEN);
+
+    // clear cookie
+    res.clearCookie('EXPENXY_REFRESH_TOKEN', {
+      sameSite: 'none',
+      httpOnly: true,
+      secure: true,
+    });
+
+    return res.status(200).send({
+      data: {
+        message: 'Logout completed',
+      },
+    });
+  } catch (error) {
+    console.log('error logOut for refreshToken', EXPENXY_REFRESH_TOKEN, error);
+    return next(error);
   }
 };

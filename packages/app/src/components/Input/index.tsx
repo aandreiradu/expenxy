@@ -12,7 +12,7 @@ function classNames(...classes: string[]) {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, type, error, className, ...props }, ref) => {
+  ({ label, type, error, className, onChange, value, ...props }, ref) => {
     const id = useId();
     return (
       <>
@@ -25,12 +25,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           </Label>
         )}
         <input
+          ref={ref}
+          id={id}
           className={classNames(
             error ? '!border-red-500' : '',
             className ? className : '',
           )}
-          ref={ref}
-          id={id}
           type={type || 'text'}
           spellCheck="false"
           {...props}

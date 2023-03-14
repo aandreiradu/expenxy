@@ -20,6 +20,16 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    setAuthData: (
+      state,
+      action: PayloadAction<{ accessToken: string; username: string }>,
+    ) => {
+      const { accessToken, username } = action.payload;
+
+      state.accessToken = accessToken;
+      state.username = username;
+    },
+
     setAccessToken: (state, action: PayloadAction<{ accessToken: string }>) => {
       state.accessToken = action.payload.accessToken;
     },
@@ -29,10 +39,14 @@ export const userSlice = createSlice({
     ) => {
       state.resetPwToken = action.payload.resetPwToken;
     },
+    logOut: (state) => {
+      state.accessToken = null;
+    },
   },
 });
 
-export const { setAccessToken, setResetPwToken } = userSlice.actions;
+export const { setAccessToken, setResetPwToken, logOut, setAuthData } =
+  userSlice.actions;
 export default userSlice.reducer;
 
 interface State {
@@ -51,3 +65,10 @@ export const selectResetToken = createSelector(
   userState,
   (state) => state.resetPwToken,
 );
+
+export const selectUserData = createSelector(userState, (state) => {
+  return {
+    username: state.username,
+    fullName: state.fullName,
+  };
+});

@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginSchema } from './schema';
 import { useHttpRequest } from '../../hooks/useHttp';
 import { useAppDispatch } from '../../store/hooks';
-import { setAccessToken } from '../../store/User/index.slice';
+import { setAccessToken, setAuthData } from '../../store/User/index.slice';
 import { useCallback, useEffect, useState } from 'react';
 import Modal from '../../components/UI/Modal';
 import { PulseLoader } from 'react-spinners';
@@ -72,11 +72,17 @@ const Login = () => {
     });
 
     if (response?.data) {
-      const { accessToken, username } = response.data;
+      const { accessToken, username, existingBankAccounts } = response.data;
+      console.log('existingBankAccounts', existingBankAccounts);
 
       if (accessToken && username) {
-        dispatch(setAccessToken({ accessToken: accessToken }));
-        navigate('/');
+        dispatch(setAuthData({ accessToken: accessToken, username: username }));
+
+        if (!existingBankAccounts) {
+          return navigate('/create-bank-account');
+        }
+
+        return navigate('/');
       }
     }
   };
@@ -132,7 +138,7 @@ const Login = () => {
           Forgot your password
         </span>
         <button
-          disabled={Object.keys(errors).length > 0 || isLoading}
+          // disabled={Object.keys(errors).length > 0 || isLoading}
           form="login"
           className="disabled:cursor-not-allowed disabled:pointer-events-none w-full bg-[#1f1f1f] mt-7 p-3 rounded-md text-lg uppercase hover:bg-white hover:text-[#1f1f1f] focus:bg-white focus:text-[#1f1f1f] focus:outline-none transition-all duration-100 ease-in"
         >
