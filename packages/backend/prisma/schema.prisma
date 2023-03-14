@@ -13,8 +13,8 @@ model User {
   password             String
   email                String    @unique
   baseCurrency         String    @default("RON")
-  refreshToken         String?
-  accessToken          String?
+  refreshToken         String?   @db.LongText
+  accessToken          String?   @db.LongText
   resetPasswordToken   String?
   resetTokenExpiration DateTime?
   Account              Account[]
