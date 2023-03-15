@@ -6,14 +6,16 @@ module.exports = {
     extend: {
       gridTemplateColumns: {
         '2_20px': 'repeat(2, 12px)',
-        'content-main-color':
-          'linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%)',
+        'content-main-color': 'linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%)',
       },
       backgroundImage: {
         landing: "url('landing-background.jpg')",
       },
       boxShadow: {
         modal: '0 2px 8px rgba(0, 0, 0, 0.26)',
+      },
+      maxHeight: {
+        sideBarHeight: 'calc(800px + 7rem)',
       },
       keyframes: {
         typing: {
