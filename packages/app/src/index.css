@@ -16,6 +16,12 @@ ol,ul {
     list-style: none;
 } */
 
+*{
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+
 body {
   background: #fff;
 }

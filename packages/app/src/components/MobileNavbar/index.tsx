@@ -24,14 +24,11 @@ const MobileNav = () => {
         <div>
           <h1 className="uppercase text-lg text-white">expenxy</h1>
         </div>
-        <List
-          onClick={sidebarHandler}
-          className="text-white w-7 h-7 cursor-pointer"
-        />
+        <List onClick={sidebarHandler} className="text-white w-7 h-7 cursor-pointer" />
       </nav>
       {/* )} */}
       {show && (
-        <Transition.Root show={show}>
+        <Transition.Root show={show} className="md:hidden">
           <Transition.Child
             enter="transition-opacity ease-linear duration-300"
             enterFrom="opacity-0"
@@ -53,26 +50,13 @@ const MobileNav = () => {
             leaveTo="-translate-x-full"
           >
             <div className="flex justify-between items-center pb-2 relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-yellow-400 after:animate-growingWidth">
-              <h1 className="text-center uppercase text-lg text-white">
-                expenxy
-              </h1>
-              <X
-                onClick={sidebarHandler}
-                className="text-white w-6 h-6 cursor-pointer ml-auto"
-              />
+              <h1 className="text-center uppercase text-lg text-white">expenxy</h1>
+              <X onClick={sidebarHandler} className="text-white w-6 h-6 cursor-pointer ml-auto" />
             </div>
             <ul>
               {sidebarNavigation.map((si) => (
-                <li
-                  key={si.href}
-                  className="flex items-center text-white my-7 cursor-pointer"
-                >
-                  <SidebarLink
-                    href={si.href}
-                    icon={si.icon}
-                    name={si.name}
-                    className="mr-2 hover:pointer-events-none p-1"
-                  />
+                <li key={si.href} className="flex items-center text-white my-7 cursor-pointer">
+                  <SidebarLink href={si.href} icon={si.icon} name={si.name} className="mr-2 hover:pointer-events-none p-1" />
                   {si.name}
                 </li>
               ))}
