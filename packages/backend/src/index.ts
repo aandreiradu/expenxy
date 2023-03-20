@@ -11,6 +11,12 @@ import authRoutes from './routes/auth';
 import transactionRoutes from './routes/transactions';
 import accountRoutes from './routes/account';
 import testRoutes from './routes/test';
+<<<<<<< HEAD
+=======
+import { Prisma } from '@prisma/client';
+import { AuthService } from './services/auth/auth';
+import jwt, { TokenExpiredError } from 'jsonwebtoken';
+>>>>>>> main
 
 const app = express();
 
@@ -44,20 +50,79 @@ export interface ResponseAPI {
 
 app.use(authRoutes);
 
+<<<<<<< HEAD
 // app.use(testRoutes);
 
+=======
+// app.get('/me', async (req, res, next) => {
+//   const refreshToken = req.cookies['EXPENXY_REFRESH_TOKEN'];
+
+//   try {
+//     const user = await AuthService.getUserByRefreshToken(refreshToken);
+//     return res.status(200).json(user);
+//   } catch (error) {
+//     res.status(400).send('blablabla');
+//   }
+// });
+
+app.post('/test', (req, res, next) => {
+  try {
+    if (!req.body.refreshToken) {
+      console.log('generate token');
+      const refreshToken = jwt.sign({ userId: 123 }, process.env.EXPENXY_LOGIN_REFRESH_EXPIRATION_PARAM!, {
+        expiresIn: '1s',
+      });
+
+      return res.status(200).send(refreshToken);
+    } else {
+      console.log('verify token');
+      const decoded = jwt.verify(req.body.refreshToken, process.env.EXPENXY_LOGIN_REFRESH_EXPIRATION_PARAM!);
+      return res.status(200).send(decoded);
+    }
+  } catch (error) {
+    if (error instanceof TokenExpiredError) {
+      const error = {
+        status: 400,
+        message: 'Token expired boss',
+      };
+
+      return next(error);
+    }
+  }
+});
+
+>>>>>>> main
 app.use(checkJWTToken);
 
 app.use(transactionRoutes);
 
 app.use(accountRoutes);
 
+<<<<<<< HEAD
 app.use((errorAxios: CustomError, req: Request, res: Response<ResponseAPI>, next: NextFunction): void => {
   console.log('error middleware', errorAxios);
   const { message, status, data, error } = errorAxios;
   const statusCode = status ?? 400;
 
   res.status(statusCode).send({
+=======
+app.use((err: CustomError, req: Request, res: Response<ResponseAPI>, next: NextFunction) => {
+  console.log('error middleware', err);
+
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    console.log('error instance of primsa', err);
+    return res.status(500).send({
+      message: 'Something went wrong. Please try again later',
+    });
+  }
+
+  const { message, status, data, error } = err;
+  const statusCode = status ?? 500;
+
+  console.log('error from Error middleware', err);
+
+  return res.status(statusCode).send({
+>>>>>>> main
     message,
     data: data,
     error: error,

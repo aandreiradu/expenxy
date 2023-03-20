@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   GoogleChromeLogo,
   Wallet,
@@ -19,6 +20,13 @@ import {
   useEffect,
   useState,
 } from 'react';
+=======
+import { GoogleChromeLogo, Wallet, TrashSimple, CalendarBlank, User, Gear, SignOut, Plus, Bank } from 'phosphor-react';
+import SidebarLink from './SidebarLink';
+import type { SidebarLinkProps } from './SidebarLink';
+import { useAppDispatch } from '../../store/hooks';
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
+>>>>>>> main
 import { useHttpRequest } from '../../hooks/useHttp';
 import { logOut } from '../../store/User/index.slice';
 import { useNavigate } from 'react-router-dom';
@@ -103,10 +111,14 @@ const Sidebar = ({ setShowComponent }: ISidebarProps) => {
       const { status } = response;
       const { message } = response.data;
 
+<<<<<<< HEAD
       if (
         (message === 'Logout completed' && status === 200) ||
         status === 204
       ) {
+=======
+      if ((message === 'Logout completed' && status === 200) || status === 204) {
+>>>>>>> main
         console.log('logout completed');
         dispatch(logOut());
         navigate('/login');
@@ -125,10 +137,24 @@ const Sidebar = ({ setShowComponent }: ISidebarProps) => {
   }, [error]);
 
   return (
+<<<<<<< HEAD
     <nav className="fixed top-0 left-0 bg-white w-[175px] h-screen  items-center flex-col hidden md:flex">
       <h1 className="text-center mt-[20px] mb-[40px] uppercase text-[30px]">
         expenxy
       </h1>
+=======
+    <nav className="fixed top-0 left-0 bg-white w-[175px] h-screen max-h-[350px] md:max-h-sideBarHeight  items-center flex-col hidden md:flex">
+      <h1 className="text-center mt-[20px] mb-[40px] uppercase text-[30px]">expenxy</h1>
+
+      {error && showModal && (
+        <Modal
+          onConfirm={() => setShowModal({ message: '', show: false })}
+          show={showModal.show}
+          title={'Ooops'}
+          message={error.message}
+        />
+      )}
+>>>>>>> main
 
       {error && showModal && (
         <Modal
@@ -146,8 +172,8 @@ const Sidebar = ({ setShowComponent }: ISidebarProps) => {
         <div className="w-4 h-4 bg-white rounded-sm"></div>
         <div className="w-4 h-4 bg-white rounded-sm"></div>
       </div>
-      <div className="flex flex-col justify-between items-center h-full pb-10">
-        <div className="flex flex-col items-center content-center gap-[40px] mt-5">
+      <div className="flex flex-col justify-between items-center h-full pb-2">
+        <div className="flex flex-col items-center content-center gap-[20px] md:gap-[34px] mt-5 max-h-[550px] overflow-y-auto px-2">
           {sidebarNavigation.map((si) => (
             <SidebarLink
               key={si.href}
@@ -159,7 +185,11 @@ const Sidebar = ({ setShowComponent }: ISidebarProps) => {
             />
           ))}
         </div>
+<<<<<<< HEAD
         <div className="p-3 group hover:bg-[#1f1f1f] rounded-md">
+=======
+        <div className="p-3 group hover:bg-[#1f1f1f] rounded-md relative before:absolute before:left-0 before:-top-4 before:w-full before:h-[1px] before:bg-gray-400">
+>>>>>>> main
           <SignOut
             className=" w-8 h-8 grid te place-self-center my-0 mx-auto rotate-180 group-hover:text-white group-hover:bg-[#1f1f1f]"
             onClick={handleLogOut}
