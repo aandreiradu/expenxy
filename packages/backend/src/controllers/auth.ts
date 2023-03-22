@@ -11,7 +11,7 @@ import {
 } from '../services/auth/types';
 import { AuthService } from '../services/auth/auth';
 import { sendMail } from '../utils/sendMail';
-import { BankAccountService } from '../services/account';
+import { BankAccountService } from '../services/account/account';
 
 export interface IResponse<T = any> {
   message?: string;
@@ -109,11 +109,6 @@ export const authController = async (
     });
   } catch (error) {
     console.log('error authController', error);
-    res.clearCookie('jwt', {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-    });
     return next(error);
   }
 };
@@ -133,89 +128,13 @@ export const refreshTokenController = async (
       status: 401,
     };
 
-    res.clearCookie('EXPENXY_REFRESH_TOKEN', {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-    });
+    res.clearCookie('EXPENXY_REFRESH_TOKEN');
 
     return next(error);
   }
 
-  // try {
-  //   const user = await AuthService.getUserByRefreshToken(jwt);
-  //   console.log('user aici', user);
-  //   const { isValid, bankAccountsNo, userId } = AuthService.checkToken({
-  //     type: 'refresh',
-  //     token: jwt,
-  //   });
-
-  //   console.log('check token returned', { isValid, bankAccountsNo });
-
-  //   if (!isValid) {
-  //     // Return 403 Forbidden - cannot decode refresh token;
-  //     console.log('403 Forbidden from refresh controller');
-  //     return res
-  //       .status(403)
-  //       .clearCookie('EXPENXY_REFRESH_TOKEN', {
-  //         sameSite: 'none',
-  //         httpOnly: true,
-  //         secure: true,
-  //         maxAge: 24 * 60 * 60 * 1000,
-  //       })
-  //       .send({ message: 'Forbidden' });
-  //   }
-
-  //   const response = await AuthService.generateAuthTokens({
-  //     userId: user.id,
-  //     username: user.username,
-  //     bankAccountsNo: bankAccountsNo,
-  //   });
-
-  //   if (response) {
-  //     const { accessToken, refreshToken } = response;
-  //     console.log('all generated with success, return to frontend', {
-  //       accessToken,
-  //       refreshToken,
-  //       bankAccountsNo,
-  //     });
-
-  //     // res.cookie('EXPENXY_REFRESH_TOKEN', refreshToken, {
-  //     //   sameSite: 'none',
-  //     //   httpOnly: true,
-  //     //   secure: true,
-  //     //   maxAge: 24 * 60 * 60 * 1000,
-  //     // });
-
-  //     return res.status(201).send({
-  //       data: {
-  //         accessToken,
-  //         username: user.username,
-  //         bankAccountsNo: bankAccountsNo || 0,
-  //       },
-  //       message: 'Generated new refresh token successfully',
-  //     });
-  //   }
-  // } catch (error) {
-  //   console.log('error refreshTokenController', error);
-  //   if (error instanceof Error) {
-  //     const { message } = error;
-
-  //     switch (message) {
-  //       case 'No user found for provided refresh token': {
-  //         const errorReturn = {
-  //           message: 'Unauthorized',
-  //           status: 401,
-  //         };
-  //         console.log('No user found for provided refresh token', errorReturn);
-  //         return next(errorReturn);
-  //       }
-  //     }
-  //   }
-  //   next(error);
-  // }
-
   try {
+    console.log('serach session for refreshTOken', jwt);
     const { userId, bankAccountsNo, username, sessionId } = await AuthService.getSessionByToken(jwt);
 
     if (!userId) {
@@ -227,11 +146,7 @@ export const refreshTokenController = async (
       };
 
       /* Clear HTTP Only refresh token from cookie  */
-      res.clearCookie('EXPENXY_REFRESH_TOKEN', {
-        httpOnly: true,
-        sameSite: 'none',
-        secure: true,
-      });
+      res.clearCookie('EXPENXY_REFRESH_TOKEN');
 
       return next(error);
     }
@@ -253,11 +168,7 @@ export const refreshTokenController = async (
       // };
 
       /* Clear HTTP Only refresh token from cookie  */
-      res.clearCookie('EXPENXY_REFRESH_TOKEN', {
-        httpOnly: true,
-        sameSite: 'none',
-        secure: true,
-      });
+      res.clearCookie('EXPENXY_REFRESH_TOKEN');
 
       return res.status(401).send({
         message: 'Unauthorized',
@@ -265,17 +176,10 @@ export const refreshTokenController = async (
     }
 
     /* Session is valid here and refresh token didnt expired */
-
     const accessToken = await AuthService.generateAccessToken(bankAccountsNo || 0, userId);
 
-    /* Clear HTTP Only refresh token from cookie  */
-    res.clearCookie('EXPENXY_REFRESH_TOKEN', {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-    });
-
     /* Attach new refresh token */
+    console.log('refreshToken', refreshToken);
     res.cookie('EXPENXY_REFRESH_TOKEN', refreshToken, {
       sameSite: 'none',
       httpOnly: true,
@@ -450,11 +354,7 @@ export const logOut = async (req: Request, res: Response<IResponse>, next: NextF
     await AuthService.logout(EXPENXY_REFRESH_TOKEN);
 
     // clear cookie
-    res.clearCookie('EXPENXY_REFRESH_TOKEN', {
-      sameSite: 'none',
-      httpOnly: true,
-      secure: true,
-    });
+    res.clearCookie('EXPENXY_REFRESH_TOKEN');
 
     return res.status(200).send({
       data: {

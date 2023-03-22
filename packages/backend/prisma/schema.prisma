@@ -2,6 +2,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// generator dbml {
+//   provider = "prisma-dbml-generator"
+// }
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -9,63 +13,73 @@ datasource db {
 
 model User {
   id                   String    @id @default(uuid())
-  username             String    @unique
-  password             String
-  email                String    @unique
-  baseCurrency         String    @default("RON")
-  resetPasswordToken   String?
-  resetTokenExpiration DateTime?
-  Account              Account[]
-  Session              Session[]
+  username             String    @db.VarChar(50)
+  password             String    @db.VarChar(100)
+  email                String    @db.VarChar(50)
+  resetPasswordToken   String?   @db.VarChar(255)
+  resetTokenExpiration DateTime? @db.DateTime(0)
+
+  accounts Account[]
+  sessions Session[]
 }
 
 model Session {
   id           String   @id @default(uuid())
-  refreshToken String   @db.LongText
-  expiresAt    DateTime
-  createdAt    DateTime @default(now())
-  User         User?    @relation(fields: [userId], references: [id])
-  userId       String
+  refreshToken String   @db.VarChar(255)
+  expiresAt    DateTime @db.DateTime(0)
+  createdAt    DateTime @default(dbgenerated("(now())")) @db.DateTime(0)
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
 }
 
 model Account {
-  id              String            @id @default(uuid())
-  userId          String
-  bankAccountType BankAccountType[]
-  currency        String
-  balance         Int
+  id         String   @id @default(uuid())
+  balance    Decimal  @db.Decimal(10, 0)
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @default(now())
 
-  user              User           @relation(fields: [userId], references: [id])
-  Transactions      Transactions[]
+  userId String
+  User   User   @relation(fields: [userId], references: [id])
+
+  currency   Currency @relation(fields: [currencyId], references: [id])
+  currencyId String
+
+  bankAccountType   BankAccountType @relation(fields: [bankAccountTypeId], references: [id])
   bankAccountTypeId String
+
+  Transaction Transaction[]
 }
 
-model Transactions {
-  id       String @id @default(uuid())
-  type     String
-  amount   Int
-  merchant String
+model BankAccountType {
+  id   String @id @default(uuid())
+  name String @db.VarChar(50)
 
-  account   Account @relation(fields: [accountId], references: [id])
-  accountId String
+  Account Account[]
 }
 
 model Currency {
   id     String @id @default(uuid())
-  name   String @unique
-  code   String @unique
-  symbol String @unique
+  name   String @db.VarChar(50)
+  code   String @db.VarChar(10)
+  symbol String @db.VarChar(10)
+
+  Account Account[]
+
+  @@unique([code, name])
 }
 
-model BankAccountType {
-  id        String   @id @default(uuid())
-  name      String
-  Account   Account? @relation(fields: [accountId], references: [id])
-  accountId String?
+enum TransactionType {
+  incoming
+  outgoing
 }
 
-model EXPENXY_CUSTOM_CONFIG {
-  id         String @id @default(uuid())
-  name       String @unique
-  configJSON Json
+model Transaction {
+  id     String          @id @default(uuid())
+  type   TransactionType
+  amount Decimal
+
+  account Account @relation(fields: [accountId], references: [id])
+
+  accountId String
 }

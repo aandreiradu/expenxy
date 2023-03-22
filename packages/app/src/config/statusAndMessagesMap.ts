@@ -18,14 +18,12 @@ const statsAndMaps: IStatsAndMessages = {
   accountCreatedSuccessfully: {
     message: 'Account created',
     status: 200,
-    frontendMessage:
-      'Account created successfully. You will be redirected to login',
+    frontendMessage: 'Account created successfully. You will be redirected to login',
   },
   existingBankAccountFound: {
     message: 'Existing account',
     status: 200,
-    frontendMessage:
-      'Looks like you already have an existing account with the same Currency and Account Type',
+    frontendMessage: 'Looks like you already have an existing account with the same Currency and Account Type',
   },
   fetchedBankingProductsSuccess: {
     message: 'Fetched banking products successfully',

@@ -138,3 +138,5 @@ dist
 packages/backend/src/routes/test.ts
 ./packages/backend/src/routes/test.ts
 /packages/backend/src/routes/test.ts
+
+dbml

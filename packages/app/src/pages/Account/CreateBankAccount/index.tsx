@@ -6,46 +6,26 @@ import { Select } from '../../../components/Select';
 import { createBankAccountSchema, type CreateBankAcountProps } from './schema';
 import { PropagateLoader } from 'react-spinners';
 import { Warning, Timer, Check } from 'phosphor-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useHttpRequest } from '../../../hooks/useHttp';
 import statsAndMaps from '../../../config/statusAndMessagesMap';
 import TopLevelNotification from '../../../components/UI/TopLevelNotification';
 import Loader from '../../../components/Loader';
-
-export interface CreateBankAccountProps {
-  title: string;
-  className?: string;
-}
-
-export interface BankingProductsRes {
-  message: string;
-  bankingProducts: [
-    {
-      name: string;
-      id: string;
-    },
-  ];
-}
+import { CreateBankAccountProps, BankingProductsRes } from './types';
 
 const currencyTypes = [{ value: 'EUR' }, { value: 'RON' }];
 
 const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
+  const [queryParams] = useSearchParams();
+  const existingAccount = queryParams.get('existingAccount');
+  const [showModal, setShowModal] = useState(false);
   const [topLevelNotification, setTopLevelNotification] = useState({
     show: false,
     message: '',
     icon: <></>,
   });
-  const [showModal, setShowModal] = useState(false);
-  const [bankingProducts, setBankingProducts] = useState<
-    | [
-        {
-          name: string;
-          id: string;
-          value?: string;
-        },
-      ]
-    | []
-  >([]);
+  const [bankingProducts, setBankingProducts] = useState<[{ name: string; id: string; value?: string }] | []>([]);
+  const [availableCurrencies, setAvailableCurrencies] = useState<[{ id: string; code: string; symbol: string }] | []>([]);
 
   const {
     formState: { errors },
@@ -67,22 +47,20 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
         withCredentials: true,
       });
 
+      console.log('bankingResponse', bankingResponse);
+
       if (bankingResponse) {
-        if (
-          bankingResponse?.message ===
-          statsAndMaps['fetchedBankingProductsSuccess']?.message
-        ) {
+        if (bankingResponse?.message === statsAndMaps['fetchedBankingProductsSuccess']?.message) {
           return {
             message: bankingResponse.message,
             bankingProducts: bankingResponse.data.bankingProducts,
+            availableCurrencies: bankingResponse.data.availableCurrecies,
           };
-        } else if (
-          bankingResponse?.message ===
-          statsAndMaps['fetchBankingProductsEmpty']?.message
-        ) {
+        } else if (bankingResponse?.message === statsAndMaps['fetchBankingProductsEmpty']?.message) {
           return {
             message: bankingResponse.message,
             bankingProducts: [],
+            availableCurrencies: [],
           };
         }
       }
@@ -100,14 +78,22 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
                 value: bp.name,
               };
             });
+
+            const modifiedCurriencies = config.availableCurrencies.map((cr: any) => {
+              return {
+                ...cr,
+                value: cr.code,
+              };
+            });
+
             setBankingProducts(modifiedBPs);
+            setAvailableCurrencies(modifiedCurriencies);
             break;
           }
           case statsAndMaps['fetchBankingProductsEmpty']?.message: {
             console.log('empty response from backend, show notification');
             setTopLevelNotification({
-              message:
-                'Ooops! Looks like no banking products are available right now. Please try again later',
+              message: 'Ooops! Looks like no banking products are available right now. Please try again later',
               show: true,
               icon: <Timer className="w-14 h-8 text-yellow-400" />,
             });
@@ -169,8 +155,7 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
         status === statsAndMaps['bankAccountCreatedSuccessfully']?.status &&
         message === statsAndMaps['bankAccountCreatedSuccessfully'].message
       ) {
-        const { frontendMessage } =
-          statsAndMaps['bankAccountCreatedSuccessfully'];
+        const { frontendMessage } = statsAndMaps['bankAccountCreatedSuccessfully'];
         if (frontendMessage) {
           setTimeout(() => {
             navigate('/');
@@ -206,10 +191,7 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
       )}
 
       <section className="relative w-screen h-screen flex flex-col items-center justify-center px-4 ">
-        <img
-          className="absolute top-0 left-0 w-full h-full brightness-[40%]"
-          src="./landing-background.jpg"
-        />
+        <img className="absolute top-0 left-0 w-full h-full brightness-[40%]" src="./landing-background.jpg" />
 
         {isLoading ? (
           <Loader
@@ -265,9 +247,7 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
                         dark:focus:border-[#fff] 
                         focus:outline-none focus:ring-0 focus:border-[#fff]"
                   required
-                  dataSourceGroup={
-                    bankingProducts.length > 0 ? bankingProducts : []
-                  }
+                  dataSourceGroup={bankingProducts.length > 0 ? bankingProducts : []}
                   label="Account Type"
                 />
               </div>
@@ -282,7 +262,7 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
             dark:focus:border-[#fff] 
             focus:outline-none focus:ring-0 focus:border-[#fff]"
                   required
-                  dataSourceGroup={currencyTypes}
+                  dataSourceGroup={availableCurrencies}
                   label="Currency"
                 />
               </div>
@@ -304,22 +284,24 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
               </div>
 
               <div className="flex items-center justify-between gap-3">
-                <Link
-                  to={'/login'}
-                  className=" !mb-4
-            p-[6px] text-base
-            md:p-2 md:text-lg          
-            disabled:cursor-not-allowed disabled:pointer-events-none 
-            w-full bg-yellow-400 text-white rounded-md 
-             uppercase 
-            hover:bg-[#1f1f1f] hover:text-white 
-            focus:bg-[#1f1f1f] focus:text-white 
-            focus:outline-none transition-all duration-100 ease-in
-            text-center
-            "
-                >
-                  Back To Login
-                </Link>
+                {!existingAccount && (
+                  <Link
+                    to={'/login'}
+                    className=" !mb-4
+                              p-[6px] text-base
+                              md:p-2 md:text-lg          
+                              disabled:cursor-not-allowed disabled:pointer-events-none 
+                              w-full bg-[#1f1f1f] text-white rounded-md 
+                              uppercase 
+                              hover:bg-yellow-400 hover:text-white 
+                              focus:bg-yellow-400 focus:text-white 
+                              focus:outline-none transition-all duration-100 ease-in
+                              text-center
+                "
+                  >
+                    Back To Login
+                  </Link>
+                )}
                 <button
                   type="submit"
                   disabled={bankingProducts.length === 0}
@@ -327,10 +309,10 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
                   className=" !mb-4
                         p-[6px] text-base
                         md:p-2 md:text-lg          
-                        w-full bg-yellow-400 text-white rounded-md 
+                        w-full bg-[#1f1f1f] text-white rounded-md 
                          uppercase 
-                        hover:bg-[#1f1f1f] hover:text-white 
-                        focus:bg-[#1f1f1f] focus:text-white 
+                        hover:bg-yellow-400 hover:text-white 
+                        focus:bg-yellow-400 focus:text-white 
                         focus:outline-none transition-all duration-100 ease-in
                         text-center
                         disabled:cursor-not-allowed disabled:pointer-events-none 

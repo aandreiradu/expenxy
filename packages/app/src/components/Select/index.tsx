@@ -29,21 +29,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <>
         {label && (
-          <Label
-            htmlFor={id}
-            className={classNames(error ? '!text-red-500' : '')}
-          >
+          <Label htmlFor={id} className={classNames(error ? '!text-red-500' : '')}>
             {label}
           </Label>
         )}
-        <select
-          className={classNames(
-            error ? '!border-red-500' : '',
-            className ? className : '',
-          )}
-          ref={ref}
-          {...props}
-        >
+        <select className={classNames(error ? '!border-red-500' : '', className ? className : '')} ref={ref} {...props}>
           <option value="" selected disabled hidden>
             {props.placeholder || 'Select'}
           </option>
