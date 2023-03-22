@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String    @id @default(uuid())
+  username             String    @unique
+  password             String
+  email                String    @unique
+  baseCurrency         String    @default("RON")
+  resetPasswordToken   String?
+  resetTokenExpiration DateTime?
+  Account              Account[]
+  Session              Session[]
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  refreshToken String   @db.LongText
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  User         User?    @relation(fields: [userId], references: [id])
+  userId       String
+}
+
+model Account {
+  id         String   @id @default(uuid())
+  userId     String
+  balance    Decimal
+  currency   Currency @relation(fields: [currencyId], references: [id])
+  currencyId String   @unique
+
+  user         User           @relation(fields: [userId], references: [id])
+  Transactions Transactions[]
+
+  bankAccountTypeId String          @unique
+  BankAccountType   BankAccountType @relation(fields: [bankAccountTypeId], references: [id])
+}
+
+model BankAccountType {
+  id   String @id @default(uuid())
+  name String
+
+  // accountId String  @unique
+  // Account   Account @relation(fields: [accountId], references: [id])
+
+  currencyId String
+  Currency   Currency @relation(fields: [currencyId], references: [id])
+  Account    Account?
+}
+
+model Transactions {
+  id       String @id @default(uuid())
+  type     String
+  amount   Int
+  merchant String
+
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
+}
+
+model Currency {
+  id              String            @id @default(uuid())
+  name            String            @unique
+  code            String            @unique
+  symbol          String            @unique
+  Account         Account[]
+  BankAccountType BankAccountType[]
+}
+
+model EXPENXY_CUSTOM_CONFIG {
+  id         String @id @default(uuid())
+  name       String @unique
+  configJSON Json
+}

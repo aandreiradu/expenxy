@@ -97,7 +97,7 @@ export const AuthService: IAuthService = {
       select: {
         _count: {
           select: {
-            Account: true,
+            accounts: true,
           },
         },
         id: true,
@@ -121,28 +121,26 @@ export const AuthService: IAuthService = {
     const refreshToken = jwt.sign(
       {
         userId: user.id,
-        bankAccountsNo: user._count.Account,
+        bankAccountsNo: user._count.accounts,
       },
       process.env.EXPENXY_LOGIN_REFRESH_SECRET!,
-      { expiresIn: process.env.EXPENXY_LOGIN_REFRESH_EXPIRATION_PARAM! || '1d' },
+      { expiresIn: '1d' },
     );
 
     /* Generate Access Token */
     const accessToken = jwt.sign(
       {
         userId: user.id,
-        bankAccountsNo: user._count.Account,
+        bankAccountsNo: user._count.accounts,
       },
       process.env.EXPENXY_LOGIN_ACCESS_SECRET!,
-      { expiresIn: process.env.EXPENXY_LOGIN_ACCESS_EXPIRATION_PARAM! || '15m' },
+      { expiresIn: '15m' },
     );
 
     const dateNow = new Date();
     const expiresAt = new Date(
       dateNow.setSeconds(dateNow.getSeconds() + Number(process.env.EXPENXY_LOGIN_REFRESH_EXPIRATION_PARAM)),
     ).toISOString();
-
-    console.log('expiresAt', expiresAt);
 
     /* Insert a new record in Sessions. */
     await prisma.session.create({
@@ -158,7 +156,7 @@ export const AuthService: IAuthService = {
       accessToken: accessToken,
       refreshToken: refreshToken,
       username: user.username,
-      bankAccountsNo: user._count.Account,
+      bankAccountsNo: user._count.accounts,
     };
   },
 
@@ -177,7 +175,7 @@ export const AuthService: IAuthService = {
           select: {
             _count: {
               select: {
-                Account: true,
+                accounts: true,
               },
             },
             username: true,
@@ -193,7 +191,7 @@ export const AuthService: IAuthService = {
 
     return {
       userId: session.userId,
-      bankAccountsNo: session.User?._count.Account || null,
+      bankAccountsNo: session.User?._count.accounts || null,
       username: session.User?.username || null,
       sessionId: session.id,
     };
@@ -235,7 +233,7 @@ export const AuthService: IAuthService = {
         return {
           isValid: true,
           userId: decoded?.userId,
-          refreshToken: null,
+          refreshToken: params.token,
         };
       }
 
@@ -254,7 +252,7 @@ export const AuthService: IAuthService = {
             bankAccountsNo: params.bankAccountsNo,
           },
           process.env.EXPENXY_LOGIN_REFRESH_SECRET!,
-          { expiresIn: process.env.EXPENXY_LOGIN_REFRESH_EXPIRATION_PARAM! || '1d' },
+          { expiresIn: '1d' },
         );
 
         const dateNow = new Date();
@@ -379,7 +377,7 @@ export const AuthService: IAuthService = {
 
     await prisma.user.update({
       where: {
-        email: email,
+        //email: email, /* TO DO PK */
       },
       data: {
         resetPasswordToken: token,
@@ -481,7 +479,7 @@ export const AuthService: IAuthService = {
         bankAccountsNo: bankAccountsNo,
       },
       process.env.EXPENXY_LOGIN_ACCESS_SECRET!,
-      { expiresIn: process.env.EXPENXY_LOGIN_ACCESS_EXPIRATION_PARAM! || '15m' },
+      { expiresIn: '15m' },
     );
 
     return accessToken;

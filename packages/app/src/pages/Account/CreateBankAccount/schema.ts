@@ -17,7 +17,7 @@ const bankAcountTypes = z.enum(['Bank Account', 'Savings', 'Morgage'], {
 export const createBankAccountSchema = z
   .object({
     accountName: z.string(),
-    currency: CurrencyEnums,
+    currency: z.string(),
     balance: z.string().default('0'),
     accountType: z.string().uuid(), //bankAcountTypes,
   })
@@ -25,7 +25,7 @@ export const createBankAccountSchema = z
     if (parseFloat(val.balance) < parseFloat('-25000')) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Minimum balance value can't be lower than -25.000",
+        message: "Minimum balance value can't be lower than 25.000",
         path: ['balance'],
       });
     }

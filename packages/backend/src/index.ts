@@ -90,8 +90,6 @@ app.use(transactionRoutes);
 
 app.use(accountRoutes);
 
-app.use(accountRoutes);
-
 app.use((err: CustomError, req: Request, res: Response<ResponseAPI>, next: NextFunction) => {
   console.log('error middleware', err);
 

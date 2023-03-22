@@ -3,15 +3,17 @@ import { IResponse } from './auth';
 import {
   createBankAccountSchema,
   type CreateBankAccountArgs,
-  BankAccountService,
-  type HasExistingAccountReturn,
-} from '../services/account';
+  //type HasExistingAccountReturn,
+} from '../services/account/types';
+import { BankAccountService } from '../services/account/account';
 
 export const getBankingProductsController = async (req: Request, res: Response<IResponse>, next: NextFunction) => {
-  try {
-    const bankingProducts = await BankAccountService.getBankingProducts();
+  console.log('getBankingProductsController hited');
 
-    if (!bankingProducts) {
+  try {
+    const { availableCurrecies, bankingProducts } = await BankAccountService.getBankingProducts();
+
+    if (!bankingProducts.length || !availableCurrecies.length) {
       return res.status(200).send({
         message: 'No banking products found',
       });
@@ -21,6 +23,7 @@ export const getBankingProductsController = async (req: Request, res: Response<I
       message: 'Fetched banking products successfully',
       data: {
         bankingProducts: bankingProducts,
+        availableCurrecies: availableCurrecies,
       },
     });
   } catch (error) {
@@ -41,7 +44,8 @@ export const getBankingProductsController = async (req: Request, res: Response<I
 
 export const createBankAccountController = async (
   req: Request<{}, {}, CreateBankAccountArgs>,
-  res: Response<IResponse<HasExistingAccountReturn | { accountId: string }>>,
+  // res: Response<IResponse<HasExistingAccountReturn | { accountId: string }>>,
+  res: Response<IResponse<any | { accountId: string }>>,
   next: NextFunction,
 ) => {
   console.log('sending to validation this', {
@@ -69,7 +73,7 @@ export const createBankAccountController = async (
   try {
     const hasExistingAccount = await BankAccountService.hasExistingAccount({
       currency: req.body.currency,
-      type: req.body.accountTypeId,
+      accountTypeId: req.body.accountTypeId,
       userId: req.metadata.userId as string,
     });
 
@@ -79,9 +83,8 @@ export const createBankAccountController = async (
       return res.status(200).send({
         message: 'Existing account',
         data: {
-          balance: hasExistingAccount.balance,
           currency: hasExistingAccount.currency,
-          bankAccountTypeId: hasExistingAccount.bankAccountTypeId,
+          bankAccountType: hasExistingAccount.accountType,
         },
       });
     }
@@ -91,6 +94,8 @@ export const createBankAccountController = async (
       accountTypeId: req.body.accountTypeId,
       userId: req.metadata.userId as string,
     });
+
+    console.log('createAccount', createAccount);
 
     if (createAccount) {
       console.log('createdAccount', createAccount, 'return to frontend');
@@ -102,7 +107,6 @@ export const createBankAccountController = async (
       });
     }
 
-    console.log('reached bottom');
     throw new Error('Someting went wrong. Please try again later!');
   } catch (error) {
     if (error instanceof Error) {
@@ -146,6 +150,8 @@ export const checkBankAccountExisting = async (
     return next('Something went wrong, please try again later!');
   }
 };
+
+export const getAccounts = async (req: Request, res: Response, next: NextFunction) => {};
 
 export const test = async (req: Request<{}, {}, { id: string }>, res: Response<IResponse>, next: NextFunction) => {
   const { id } = req.body;

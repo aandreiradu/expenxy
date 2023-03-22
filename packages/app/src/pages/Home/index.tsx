@@ -24,19 +24,19 @@ const Home = () => {
     console.log('showComponent', showComponent);
   }, [showComponent]);
 
-  useEffect(() => {
-    const getBankAccountConfig = async () => {
-      const bankingResponse = await sendRequest({
-        url: '/getBankingProducts',
-        method: 'GET',
-        withCredentials: true,
-      });
+  // useEffect(() => {
+  //   const getBankAccountConfig = async () => {
+  //     const bankingResponse = await sendRequest({
+  //       url: '/getBankingProducts',
+  //       method: 'GET',
+  //       withCredentials: true,
+  //     });
 
-      console.log('bankingResponse', bankingResponse);
-    };
+  //     console.log('bankingResponse', bankingResponse);
+  //   };
 
-    getBankAccountConfig();
-  }, []);
+  //   getBankAccountConfig();
+  // }, []);
 
   return (
     <>
