@@ -21,7 +21,7 @@ export const sidebarNavigation: SidebarLinkProps[] = [
   },
   {
     isLink: true,
-    href: '/create-bank-account',
+    href: '/create-bank-account?existingAccount=true',
     icon: <Bank className={sidebarIconClasses} />,
     name: 'Create Bank Account',
     setShowComponent: () => {},
