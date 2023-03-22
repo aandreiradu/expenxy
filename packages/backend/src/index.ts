@@ -86,11 +86,9 @@ app.post('/test', (req, res, next) => {
 
 app.use(checkJWTToken);
 
+app.use(accountRoutes);
+
 app.use(transactionRoutes);
-
-app.use(accountRoutes);
-
-app.use(accountRoutes);
 
 app.use((err: CustomError, req: Request, res: Response<ResponseAPI>, next: NextFunction) => {
   console.log('error middleware', err);
