@@ -164,9 +164,9 @@ export const AuthService: IAuthService = {
     const session = await prisma.session.findFirst({
       where: {
         refreshToken: refreshToken,
-        expiresAt: {
-          gt: new Date(),
-        },
+        // expiresAt: {
+        //   gt: new Date(),
+        // },
       },
       select: {
         id: true,
