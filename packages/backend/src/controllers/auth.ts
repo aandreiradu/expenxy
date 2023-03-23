@@ -363,6 +363,7 @@ export const logOut = async (req: Request, res: Response<IResponse>, next: NextF
     });
   } catch (error) {
     console.log('error logOut for refreshToken', EXPENXY_REFRESH_TOKEN, error);
+
     return next(error);
   }
 };

@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { IResponse } from './auth';
 import {
+  CreateBankAccountResExisting,
+  CreateBankAccountResSucces,
+  CreateBankAccountResValidationErr,
   createBankAccountSchema,
   type CreateBankAccountArgs,
   //type HasExistingAccountReturn,
@@ -38,28 +41,24 @@ export const getBankingProductsController = async (req: Request, res: Response<I
       return next(error.message);
     }
 
-    return next('Something went wrong, please try again later!');
+    return next({
+      message: 'Something went wrong',
+      status: 500,
+    });
   }
 };
 
 export const createBankAccountController = async (
   req: Request<{}, {}, CreateBankAccountArgs>,
-  // res: Response<IResponse<HasExistingAccountReturn | { accountId: string }>>,
-  res: Response<IResponse<any | { accountId: string }>>,
+  res: Response<IResponse<CreateBankAccountResSucces | CreateBankAccountResExisting | CreateBankAccountResValidationErr>>,
   next: NextFunction,
 ) => {
-  console.log('sending to validation this', {
-    ...req.body,
-    userId: req.metadata.userId,
-  });
   const resultSchema = createBankAccountSchema.safeParse({
     ...req.body,
     userId: req.metadata.userId,
   });
 
   if (!resultSchema.success) {
-    console.log('error validation', resultSchema.error.flatten());
-
     const flattenErrors = resultSchema.error.flatten();
 
     return res.status(400).send({
