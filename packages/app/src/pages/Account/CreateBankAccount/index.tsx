@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createRef, FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Input } from '../../../components/Input';
 import { Select } from '../../../components/Select';
@@ -12,13 +12,11 @@ import statsAndMaps from '../../../config/statusAndMessagesMap';
 import TopLevelNotification from '../../../components/UI/TopLevelNotification';
 import Loader from '../../../components/Loader';
 import { CreateBankAccountProps, BankingProductsRes } from './types';
-
-const currencyTypes = [{ value: 'EUR' }, { value: 'RON' }];
+import BackButton from '../../../components/BackButton';
 
 const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
   const [queryParams] = useSearchParams();
   const existingAccount = queryParams.get('existingAccount');
-  const [showModal, setShowModal] = useState(false);
   const [topLevelNotification, setTopLevelNotification] = useState({
     show: false,
     message: '',
@@ -32,6 +30,7 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
     register,
     handleSubmit,
     reset,
+    setError,
   } = useForm<CreateBankAcountProps>({
     resolver: zodResolver(createBankAccountSchema),
     mode: 'onSubmit',
@@ -112,18 +111,29 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
 
   useEffect(() => {
     if (error) {
-      console.log('error effect running', error);
-      const { message, fieldErrors } = error;
+      const { message, fieldErrors, status } = error;
 
-      /*
-        !!! TODO: Error handle here 
-      */
+      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+        for (let idx in fieldErrors) {
+          setError(String(idx) as any, { message: String(fieldErrors[idx]) });
+        }
+
+        return setTopLevelNotification({
+          show: true,
+          message: message || 'Someting went wrong, please try again later!',
+          icon: <Warning className="w-14 h-8 text-red-700" />,
+        });
+      }
+
+      return setTopLevelNotification({
+        show: true,
+        message: message || 'Someting went wrong, please try again later!',
+        icon: <Warning className="w-14 h-8 text-red-700" />,
+      });
     }
   }, [error]);
 
   const onSubmit: SubmitHandler<CreateBankAcountProps> = async (data) => {
-    console.log('data', data);
-
     const createBankAccResponse = await sendRequest({
       method: 'POST',
       url: '/createBankAccount',
@@ -132,7 +142,7 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
         accountName: data.accountName,
         currency: data.currency,
         balance: data.balance,
-        accountTypeId: data.accountType,
+        accountTypeId: data.accountTypeId,
       },
     });
 
@@ -176,7 +186,7 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
       {topLevelNotification.show && (
         <TopLevelNotification
           hasCloseButton={false}
-          dismissAfterXMs={5500}
+          dismissAfterXMs={error ? 10000 : 5500}
           message={topLevelNotification.message}
           show={topLevelNotification.show}
           onClose={() =>
@@ -192,6 +202,9 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
 
       <section className="relative w-screen h-screen flex flex-col items-center justify-center px-4 ">
         <img className="absolute top-0 left-0 w-full h-full brightness-[40%]" src="./landing-background.jpg" />
+        {existingAccount && (
+          <BackButton id="backButton" value="Back" onClick={() => navigate(-1)} classNames="bg-red-700 text-white z-10" />
+        )}
 
         {isLoading ? (
           <Loader
@@ -226,20 +239,20 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
                   error={errors.accountName?.message}
                   type="text"
                   className="block w-full mt-2 py-2 text-base text-white bg-transparent 
-            border-0 border-b-2 border-yellow-400
-            appearance-none 
-            dark:text-white 
-            dark:border-yellow-500 
-            dark:focus:border-[#fff] 
-            focus:outline-none focus:ring-0 focus:border-[#fff]"
+                            border-0 border-b-2 border-yellow-400
+                            appearance-none 
+                            dark:text-white 
+                            dark:border-yellow-500 
+                            dark:focus:border-[#fff] 
+                            focus:outline-none focus:ring-0 focus:border-[#fff]"
                   required
                   label="Account Name"
                 />
               </div>
               <div className="relative z-0">
                 <Select
-                  {...register('accountType')}
-                  error={errors.accountType?.message}
+                  {...register('accountTypeId')}
+                  error={errors.accountTypeId?.message}
                   className=" block w-full mt-2 py-2 text-base text-white bg-transparent 
                         border-0 border-b-2 border-yellow-400 
                         appearance-none dark:text-white 
@@ -256,11 +269,11 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
                   {...register('currency')}
                   error={errors.currency?.message}
                   className=" block w-full mt-2 py-2 text-base text-white bg-transparent 
-            border-0 border-b-2 border-yellow-400 
-            appearance-none dark:text-white 
-            dark:border-yellow-400 
-            dark:focus:border-[#fff] 
-            focus:outline-none focus:ring-0 focus:border-[#fff]"
+                              border-0 border-b-2 border-yellow-400 
+                              appearance-none dark:text-white 
+                              dark:border-yellow-400 
+                              dark:focus:border-[#fff] 
+                              focus:outline-none focus:ring-0 focus:border-[#fff]"
                   required
                   dataSourceGroup={availableCurrencies}
                   label="Currency"
@@ -272,12 +285,12 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
                   error={errors.balance?.message}
                   type="number"
                   className="block w-full mt-2 py-2 text-base text-white bg-transparent 
-            border-0 border-b-2 border-yellow-400 
-            appearance-none 
-            dark:text-white 
-            dark:border-yellow-400 
-            dark:focus:border-[#fff] 
-            focus:outline-none focus:ring-0 focus:border-[#fff]"
+                              border-0 border-b-2 border-yellow-400 
+                              appearance-none 
+                              dark:text-white 
+                              dark:border-yellow-400 
+                              dark:focus:border-[#fff] 
+                              focus:outline-none focus:ring-0 focus:border-[#fff]"
                   label="Balance"
                   defaultValue="0"
                 />
