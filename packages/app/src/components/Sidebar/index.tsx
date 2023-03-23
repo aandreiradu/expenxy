@@ -98,8 +98,17 @@ const Sidebar = ({ setShowComponent }: ISidebarProps) => {
   }, [error]);
 
   return (
-    <nav className="fixed top-0 left-0 bg-white w-[175px] h-screen  items-center flex-col hidden md:flex">
+    <nav className="fixed top-0 left-0 bg-white w-[175px] h-screen max-h-[350px] md:max-h-sideBarHeight  items-center flex-col hidden md:flex">
       <h1 className="text-center mt-[20px] mb-[40px] uppercase text-[30px]">expenxy</h1>
+
+      {error && showModal && (
+        <Modal
+          onConfirm={() => setShowModal({ message: '', show: false })}
+          show={showModal.show}
+          title={'Ooops'}
+          message={error.message}
+        />
+      )}
 
       {error && showModal && (
         <Modal
