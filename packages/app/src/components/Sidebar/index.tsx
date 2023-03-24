@@ -48,6 +48,12 @@ export const sidebarNavigation: SidebarLinkProps[] = [
     name: 'Settings',
     setShowComponent: () => {},
   },
+  {
+    href: '/settings',
+    icon: <Gear className={sidebarIconClasses} />,
+    name: 'Settings',
+    setShowComponent: () => {},
+  },
 ];
 
 interface ISidebarProps {
