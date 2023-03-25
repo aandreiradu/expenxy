@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Account from '../../components/Account';
 import MainContent from '../../components/MainContent';
 import MobileNav from '../../components/MobileNavbar';
 import RecentTransactions from '../../components/RecentTransactions';
@@ -48,6 +49,7 @@ const Home = () => {
           componentName={showComponent.componentName}
           setShowComponent={setShowComponent}
         />
+        <Account />
         <RecentTransactions />
       </MainContent>
     </>
