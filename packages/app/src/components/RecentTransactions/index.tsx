@@ -3,7 +3,8 @@ import TransactionItem from './TransactionItem';
 
 const RecentTransactions = () => {
   return (
-    <div className="w-full max-w-md mt-auto h-[350px] max-h-[400px] ">
+    // <div className="w-full max-w-md mt-auto h-[350px] max-h-[400px] ">
+    <div className="w-full h-[350px] max-h-[400px] ">
       <div className="w-full flex justify-between items-center py-3">
         <p className="text-black font-bold text-lg">Recent Transactions</p>
         <span className="cursor-pointer relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-gray-400 px-5 leading-7 text-[12px] text-gray-400">

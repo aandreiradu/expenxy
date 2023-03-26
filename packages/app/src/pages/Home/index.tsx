@@ -4,7 +4,6 @@ import MainContent from '../../components/MainContent';
 import MobileNav from '../../components/MobileNavbar';
 import RecentTransactions from '../../components/RecentTransactions';
 import Sidebar from '../../components/Sidebar';
-import { useHttpRequest } from '../../hooks/useHttp';
 import { useAppSelector } from '../../store/hooks';
 import { selectAccessToken } from '../../store/User/index.slice';
 import AddTransaction from '../AddTransaction';
@@ -15,29 +14,10 @@ export type TShowComponent = {
 };
 
 const Home = () => {
-  const { error, isLoading, sendRequest } = useHttpRequest();
   const [showComponent, setShowComponent] = useState<TShowComponent>({
     show: false,
     componentName: '',
   });
-
-  useEffect(() => {
-    console.log('showComponent', showComponent);
-  }, [showComponent]);
-
-  // useEffect(() => {
-  //   const getBankAccountConfig = async () => {
-  //     const bankingResponse = await sendRequest({
-  //       url: '/getBankingProducts',
-  //       method: 'GET',
-  //       withCredentials: true,
-  //     });
-
-  //     console.log('bankingResponse', bankingResponse);
-  //   };
-
-  //   getBankAccountConfig();
-  // }, []);
 
   return (
     <>
@@ -49,8 +29,16 @@ const Home = () => {
           componentName={showComponent.componentName}
           setShowComponent={setShowComponent}
         />
-        <Account />
-        <RecentTransactions />
+        <div className="w-full h-full flex justify-between gap-14 py-3">
+          <div className="flex-1 w-full max-w-xl h-full flex flex-col justify-between">
+            <Account />
+            <RecentTransactions />
+          </div>
+          <div className="flex-1 w-full h-full flex flex-col justify-between bg-green-600">
+            <p>balance</p>
+            <p>expenses</p>
+          </div>
+        </div>
       </MainContent>
     </>
   );

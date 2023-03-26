@@ -1,9 +1,10 @@
 import React, { FC, ReactNode } from 'react';
 import { CreditCard, Bank, Coins } from 'phosphor-react';
 
-const BANK_ACCOUNT_TYPES = {
-  Debit: 'debit',
-  Savings: 'savings',
+export const BANK_ACCOUNT_TYPES = {
+  'Savings': 'Savings',
+  'Mortgage': 'Mortgage',
+  'Bank Account': 'Bank Account',
 } as const;
 
 type BankAccountType = keyof typeof BANK_ACCOUNT_TYPES;
@@ -17,7 +18,8 @@ export type BankCard = {
 
 const getCardStyles = (type: BankAccountType): { icon: ReactNode; classes: string } => {
   switch (type) {
-    case 'Debit': {
+    case 'Bank Account':
+    case 'Mortgage': {
       return {
         icon: <CreditCard className="w-5 h-6" />,
         classes: 'bg-debitCardPattern bg-center bg-cover',
@@ -49,8 +51,9 @@ const BankCard: FC<BankCard> = ({ balance, currency, name, type }) => {
         <h4 className="text-base text-right overflow-hidden overflow-ellipsis tracking-wide">{name}</h4>
         {icon}
       </div>
-      <p className="mt-3 text-lg">
-        {balance} {currency}
+      <p className="mt-3 text-lg flex items-center justify-between w-full">
+        <span className="text-lg">{balance}</span>
+        <span className="text-base uppercase">{currency}</span>
       </p>
     </div>
   );

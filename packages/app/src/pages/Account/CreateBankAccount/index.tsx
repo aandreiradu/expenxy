@@ -13,11 +13,12 @@ import TopLevelNotification from '../../../components/UI/TopLevelNotification';
 import Loader from '../../../components/Loader';
 import { CreateBankAccountProps, BankingProductsRes } from './types';
 import BackButton from '../../../components/BackButton';
+import { TTopLevelNotification } from './types';
 
 const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
   const [queryParams] = useSearchParams();
   const existingAccount = queryParams.get('existingAccount');
-  const [topLevelNotification, setTopLevelNotification] = useState({
+  const [topLevelNotification, setTopLevelNotification] = useState<TTopLevelNotification>({
     show: false,
     message: '',
     icon: <></>,
