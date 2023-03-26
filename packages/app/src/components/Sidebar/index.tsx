@@ -119,7 +119,7 @@ const Sidebar = ({ setShowComponent }: ISidebarProps) => {
       )}
 
       {/* Squares */}
-      <div className="shadow-2xl w-[90px] h-[90px] text-center mb-[20px] rounded-[12px] bg-[#1f1f1f] text-white grid content-center justify-center place-items-center  grid-cols-2_20px gap-[10px] twoCols">
+      <div className="shadow-[0_2.8px_2.2px_rgba(0,_0,_0,_0.034),_0_6.7px_5.3px_rgba(0,_0,_0,_0.048),_0_12.5px_10px_rgba(0,_0,_0,_0.06),_0_22.3px_17.9px_rgba(0,_0,_0,_0.072),_0_41.8px_33.4px_rgba(0,_0,_0,_0.086),_0_100px_80px_rgba(0,_0,_0,_0.12)] w-[90px] h-[90px] text-center mb-[20px] rounded-[12px] bg-[#1f1f1f] text-white grid content-center justify-center place-items-center  grid-cols-2_20px gap-[10px] twoCols">
         <div className="w-4 h-4 bg-white rounded-sm"></div>
         <div className="w-4 h-4 bg-white rounded-sm"></div>
         <div className="w-4 h-4 bg-white rounded-sm"></div>
