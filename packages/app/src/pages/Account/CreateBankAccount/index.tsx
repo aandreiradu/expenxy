@@ -202,6 +202,7 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
 
       <section className="relative w-screen h-screen flex flex-col items-center justify-center px-4 ">
         <img className="absolute top-0 left-0 w-full h-full brightness-[40%]" src="./landing-background.jpg" />
+
         {existingAccount && (
           <BackButton id="backButton" value="Back" onClick={() => navigate(-1)} classNames="bg-red-700 text-white z-10" />
         )}
