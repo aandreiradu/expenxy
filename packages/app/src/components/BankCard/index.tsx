@@ -44,16 +44,12 @@ const BankCard: FC<BankCard> = ({ balance, currency, name, type }) => {
   const { classes, icon } = getCardStyles(type);
 
   return (
-    <div className={`relative rounded-lg md:h-28 md:w-52 bg-black flex flex-shrink-0 flex-col text-white p-2 ${classes}`}>
+    <div className={`relative rounded-lg md:h-36 md:w-60 bg-black flex flex-shrink-0 flex-col text-white p-2 ${classes}`}>
       <div className="flex justify-between items-center">
-        <h4 className="text-base text-right overflow-hidden overflow-ellipsis tracking-wide">
-          {name}
-
-          {type}
-        </h4>
+        <h4 className="text-base text-right overflow-hidden overflow-ellipsis tracking-wide">{name}</h4>
         {icon}
       </div>
-      <p>
+      <p className="mt-3 text-lg">
         {balance} {currency}
       </p>
     </div>
