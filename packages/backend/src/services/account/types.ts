@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Account } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime';
 
 export const bankAccountTypes = z.enum(['Bank Account', 'Savings', 'Morgage'], {
   errorMap: (issue) => {
@@ -77,4 +78,18 @@ export type CreateBankAccountResValidationErr = {
   fieldErrors: {
     [key: string]: string[];
   };
+};
+
+/* Return Type Get Accounts Data */
+export type TGetAccountsData = {
+  accounts: {
+    balance: Decimal;
+    currency: {
+      name: string;
+      code: string;
+    };
+    bankAccountType: {
+      name: string;
+    };
+  }[];
 };

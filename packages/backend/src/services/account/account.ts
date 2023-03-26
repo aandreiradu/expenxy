@@ -1,6 +1,6 @@
 import { getAccounts } from '../../controllers/account';
 import prisma from '../../utils/prisma';
-import { CreateBankAccountArgs, HasExistingAccountReturn, THasExistingAccount } from './types';
+import { CreateBankAccountArgs, HasExistingAccountReturn, TGetAccountsData, THasExistingAccount } from './types';
 
 interface IAccount {
   getBankingProducts(): Promise<{
@@ -19,7 +19,7 @@ interface IAccount {
 
   needsBankAccount(id: string): Promise<boolean>;
 
-  getAccounts(userId: string): Promise<any>;
+  getAccounts(userId: string): Promise<TGetAccountsData | null>;
 }
 
 export const BankAccountService: IAccount = {
@@ -201,31 +201,45 @@ export const BankAccountService: IAccount = {
   },
 
   async getAccounts(userId: string) {
-    const existingAccounts = await prisma.user.findFirst({
-      where: {
-        id: userId,
-      },
-      select: {
-        accounts: {
-          select: {
-            balance: true,
-            currency: true,
-            // bankAccountType: {
-            //   select: {
-            //     name: true,
-            //   },
-            // },
+    try {
+      const existingAccounts = await prisma.user.findFirst({
+        where: {
+          id: userId,
+        },
+        select: {
+          accounts: {
+            select: {
+              balance: true,
+              currency: {
+                select: {
+                  name: true,
+                  code: true,
+                },
+              },
+              bankAccountType: {
+                select: {
+                  name: true,
+                },
+              },
+            },
           },
         },
-      },
-    });
+      });
 
-    console.log('existingAccounts', existingAccounts);
+      if (existingAccounts) {
+        return existingAccounts;
+      }
 
-    if (existingAccounts) {
-      return existingAccounts;
+      return null;
+    } catch (error) {
+      console.log('ERRROR __getAccounts service - userId ', userId, error);
+      if (error instanceof Error) {
+        const { message } = error;
+
+        throw new Error(message);
+      }
+
+      throw new Error('Something went wrong. Please try again later');
     }
-
-    return null;
   },
 };

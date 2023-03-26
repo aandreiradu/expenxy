@@ -107,14 +107,25 @@ export const AuthService: IAuthService = {
     });
 
     if (!user || !user.id) {
-      throw new Error('Invalid email or password');
+      const error = {
+        message: 'Invalid email or password',
+        status: 400,
+      };
+      // throw new Error('Invalid email or password');
+      throw error;
     }
 
     console.log('user', user);
 
     const decryptedPw = await bcrypt.compare(params.password, user.password);
     if (!decryptedPw) {
-      throw new Error('Invalid email or password');
+      // throw new Error('Invalid email or password');
+
+      const error = {
+        message: 'Invalid email or password',
+        status: 400,
+      };
+      throw error;
     }
 
     /* Generate Refresh Token */
