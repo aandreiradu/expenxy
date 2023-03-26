@@ -150,7 +150,39 @@ export const checkBankAccountExisting = async (
   }
 };
 
-export const getAccounts = async (req: Request, res: Response, next: NextFunction) => {};
+export const getAccounts = async (req: Request, res: Response<IResponse>, next: NextFunction) => {
+  try {
+    const accountsData = await BankAccountService.getAccounts(req.metadata.userId as string);
+    if (accountsData) {
+      const { accounts } = accountsData;
+
+      if (accounts.length > 0) {
+        return res.status(200).send({
+          data: {
+            accounts,
+          },
+        });
+      }
+    }
+
+    return res.status(200).send({
+      message: 'No accounts found',
+    });
+  } catch (error) {
+    console.log('ERRROR __getAccounts controller - userId ', req.metadata.userId, error);
+    if (error instanceof Error) {
+      const { message } = error;
+
+      return res.status(500).send({
+        message: message,
+      });
+    }
+
+    return res.status(500).send({
+      message: 'Something went wrong. Please try again later',
+    });
+  }
+};
 
 export const test = async (req: Request<{}, {}, { id: string }>, res: Response<IResponse>, next: NextFunction) => {
   const { id } = req.body;
