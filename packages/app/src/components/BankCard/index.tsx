@@ -13,10 +13,10 @@ export type BankCard = {
   name: string;
   balance: number;
   currency: string;
-  type: BankAccountType;
+  type: BankAccountType | '';
 };
 
-const getCardStyles = (type: BankAccountType): { icon: ReactNode; classes: string } => {
+const getCardStyles = (type: BankAccountType | ''): { icon: ReactNode; classes: string } => {
   switch (type) {
     case 'Bank Account':
     case 'Mortgage': {

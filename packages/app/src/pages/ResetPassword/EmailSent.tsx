@@ -2,7 +2,7 @@ import React, { useCallback, useEffect } from 'react';
 import ResetPasswordLayout from '../../components/Layouts/ResetPasswordLayout';
 import { Envelope, ArrowLeft } from 'phosphor-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { selectResetToken } from '../../store/User/index.slice';
+import { selectResetToken } from '../../store/User/index.selector';
 import { useSelector } from 'react-redux';
 
 const EmailSent = () => {
@@ -27,13 +27,8 @@ const EmailSent = () => {
       description={`We sent a password reset link to ${email}`}
       headerIcon={<Envelope className="w-9 h-9 p-1 text-black rounded-full" />}
     >
-      <span className="mt-4 text-sm text-gray-500">
-        Didn't received the email? Click to resend
-      </span>
-      <div
-        className="flex w-full items-center justify-center gap-2 mt-6 cursor-pointer"
-        onClick={redirectToLogin}
-      >
+      <span className="mt-4 text-sm text-gray-500">Didn't received the email? Click to resend</span>
+      <div className="flex w-full items-center justify-center gap-2 mt-6 cursor-pointer" onClick={redirectToLogin}>
         <ArrowLeft className="text-gray-500" />
         <p className="text-sm text-gray-500">Back To Log In</p>
       </div>

@@ -1,14 +1,16 @@
-import { RootState, store } from '../store';
 import { createSelector } from '@reduxjs/toolkit';
-import { IUserState } from './index.slice';
+import { IState } from '../store';
 
-interface State {
-  user: IUserState;
-}
+// Selectors
+const userState = (state: IState) => state.user;
 
-export const userState = (state: State) => state.user;
+export const selectAccessToken = createSelector(userState, (state) => state.accessToken);
 
-export const selectAccessToken = createSelector(
-  userState,
-  (state) => state.accessToken,
-);
+export const selectResetToken = createSelector(userState, (state) => state.resetPwToken);
+
+export const selectUserData = createSelector(userState, (state) => {
+  return {
+    username: state.username,
+    fullName: state.fullName,
+  };
+});

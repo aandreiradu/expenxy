@@ -20,10 +20,7 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setAuthData: (
-      state,
-      action: PayloadAction<{ accessToken: string; username: string }>,
-    ) => {
+    setAuthData: (state, action: PayloadAction<{ accessToken: string; username: string }>) => {
       const { accessToken, username } = action.payload;
 
       state.accessToken = accessToken;
@@ -33,10 +30,7 @@ export const userSlice = createSlice({
     setAccessToken: (state, action: PayloadAction<{ accessToken: string }>) => {
       state.accessToken = action.payload.accessToken;
     },
-    setResetPwToken: (
-      state,
-      action: PayloadAction<{ resetPwToken: string }>,
-    ) => {
+    setResetPwToken: (state, action: PayloadAction<{ resetPwToken: string }>) => {
       state.resetPwToken = action.payload.resetPwToken;
     },
     logOut: (state) => {
@@ -45,30 +39,5 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setAccessToken, setResetPwToken, logOut, setAuthData } =
-  userSlice.actions;
+export const { setAccessToken, setResetPwToken, logOut, setAuthData } = userSlice.actions;
 export default userSlice.reducer;
-
-interface State {
-  user: IUserState;
-}
-
-// Selectors
-const userState = (state: State) => state.user;
-
-export const selectAccessToken = createSelector(
-  userState,
-  (state) => state.accessToken,
-);
-
-export const selectResetToken = createSelector(
-  userState,
-  (state) => state.resetPwToken,
-);
-
-export const selectUserData = createSelector(userState, (state) => {
-  return {
-    username: state.username,
-    fullName: state.fullName,
-  };
-});

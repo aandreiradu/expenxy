@@ -1,26 +1,26 @@
 import BankCard from '../BankCard';
 import { ArrowLeft, ArrowRight, Warning } from 'phosphor-react';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHttpRequest } from '../../hooks/useHttp';
 import Loader from '../Loader';
 import { PropagateLoader } from 'react-spinners';
 import { TAccountsData } from './types';
 import { TTopLevelNotification } from '../../pages/Account/CreateBankAccount/types';
 import TopLevelNotification from '../UI/TopLevelNotification';
+import { setAccountData } from '../../store/Account/index.slice';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUserAccounts } from '../../store/Account/index.selector';
 
 const Account = () => {
+  const dispatch = useDispatch();
+  const userAccounts = useSelector(selectUserAccounts);
   const [topLevelNotification, setTopLevelNotification] = useState<TTopLevelNotification>({
     show: false,
     message: '',
     icon: <></>,
   });
-  const [accountsData, setAccountsData] = useState<TAccountsData | []>([]);
   const { error, isLoading, sendRequest } = useHttpRequest();
   const carousel = useRef<null | HTMLDivElement>(null);
-
-  useEffect(() => {
-    console.log('topLevelNotification state', topLevelNotification);
-  }, [topLevelNotification]);
 
   const handleArrowsClicks = useCallback((direction: 'left' | 'right') => {
     if (!carousel?.current) return;
@@ -66,9 +66,10 @@ const Account = () => {
         const { message, status } = accountsData;
         if (status === 200) {
           if (message === 'No accounts found') {
-            return setAccountsData([]);
+            return dispatch(setAccountData([]));
           }
-          return setAccountsData(accountsData.data.accounts);
+
+          return dispatch(setAccountData(accountsData.data.accounts));
         }
       }
     };
@@ -123,7 +124,7 @@ const Account = () => {
     );
   }
 
-  return accountsData?.length > 0 ? (
+  return userAccounts?.length > 0 ? (
     <div
       className="
         relative rounded-md flex gap-5 items-center bg-white px-5
@@ -135,7 +136,7 @@ const Account = () => {
         <ArrowLeft cursor="pointer" className="w-6 h-6 text-white" onClick={handleArrowsClicks.bind(this, 'right')} />
       </div>
       <div className="w-full overflow-y-auto flex gap-3" ref={carousel}>
-        {accountsData?.map((account) => (
+        {userAccounts?.map((account) => (
           <BankCard
             key={`${account.bankAccountType.name} ${account.currency.code}`}
             balance={Number(account.balance)}

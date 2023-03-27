@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { useSelector } from 'react-redux';
-import { selectUserData } from '../../store/User/index.slice';
+import { selectUserData } from '../../store/User/index.selector';
 import Header from './Header';
 
 const MainContent = ({ children }: PropsWithChildren) => {
