@@ -3,13 +3,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Dispatch, FC, SetStateAction, useCallback, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Input } from '../../components/Input';
-import { Select } from '../../components/Select';
 import { TShowComponent } from '../Home';
 import { AddTransactionProps, addTransactionSchema } from './schema';
 import { useHttpRequest } from '../../hooks/useHttp';
 import { Listbox, Transition } from '@headlessui/react';
-import { ArrowDown, Check, CaretCircleDown } from 'phosphor-react';
-import Label from '../../components/Label';
+import { Check, CaretCircleDown } from 'phosphor-react';
 import { useSelector } from 'react-redux';
 import { selectUserAccounts } from '../../store/Account/index.selector';
 
@@ -20,26 +18,19 @@ type TAddTransaction = TShowComponent & {
 };
 
 const typeProps: { value: AvailableTypes }[] = [{ value: 'Expense' }, { value: 'Income' }];
-const currencyProps: { value: AvailableCurrency }[] = [{ value: 'EUR' }, { value: 'RON' }];
-
-const people = [
-  { id: 1, name: 'Durward Reynolds', unavailable: false },
-  { id: 2, name: 'Kenton Towne', unavailable: false },
-  { id: 3, name: 'Therese Wunsch', unavailable: false },
-  { id: 4, name: 'Benedict Kessler', unavailable: true },
-  { id: 5, name: 'Katelyn Rohan', unavailable: false },
-];
-
-const types = ['Income', 'Expense'];
 
 const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowComponent }) => {
   const userAccounts = useSelector(selectUserAccounts);
-  const [selected, setSelected] = useState(userAccounts[0].bankAccountType.name);
-  const [type, setType] = useState(types[0]);
+  const [selected, setSelected] = useState<{ name: string; id: string }>({
+    name: userAccounts[0].bankAccountType.name,
+    id: userAccounts[0].id,
+  });
+  const [type, setType] = useState(typeProps[0].value);
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    setValue,
+    formState: { errors, isSubmitting },
     reset,
   } = useForm<AddTransactionProps>({
     resolver: zodResolver(addTransactionSchema),
@@ -54,30 +45,22 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
     });
   }, []);
 
-  // const onSubmit: SubmitHandler<AddTransactionProps> = async (data) => {
-  //   console.log('data', data);
-
-  //   const response = await sendRequest({
-  //     url: '/test',
-  //     method: 'POST',
-  //     withCredentials: true,
-  //     body: {
-  //       transactionType: data.transactionType,
-  //       amount: data.amount,
-  //       merchant: data.merchant,
-  //       currency: data.currency,
-  //       date: data.date,
-  //     },
-  //   });
-
-  //   console.log('response', response);
-  // };
+  const onSubmit: SubmitHandler<AddTransactionProps> = async (data) => {
+    console.log('datatatata', data);
+    console.log('errors', errors);
+  };
 
   const handleAccountChange = (e: any) => {
-    console.log('e', e);
+    setSelected({
+      name: e.name,
+      id: e.id,
+    });
+    setValue('account', e.id);
+  };
 
-    setSelected(e.bankAccountType.name);
-    return;
+  const handleTransactionTypeChange = (e: any) => {
+    setType(e.value);
+    setValue('transactionType', e.value);
   };
 
   return (
@@ -96,18 +79,22 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
                 </span>
                 <h2 className="text-center flex-1 text-lg uppercase tracking-wide">New Transaction</h2>
 
-                <form className="gap-5 px-4 mt-4 w-full max-h-96 h-full grid grid-cols-2 justify-between">
+                <form
+                  className="gap-5 px-5 mt-4 w-full max-h-96 h-full grid grid-cols-2 justify-between"
+                  // id="addTransaction"
+                  onSubmit={handleSubmit(onSubmit)}
+                >
                   {/* Account */}
-
                   <Listbox value={selected} onChange={handleAccountChange}>
                     <div className="relative">
                       <Listbox.Label className="mb-3">Account</Listbox.Label>
                       <Listbox.Button className="text-white bg-transparent border border-white relative w-full cursor-default rounded-lg py-2 pl-3 pr-10 text-left shadow-md focus:outline-none sm:text-sm">
-                        <span className="block truncate">{selected || userAccounts[0].bankAccountType.name}</span>
+                        <span className="block truncate">{selected.name || `${userAccounts[0].name}`}</span>
                         <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                           <CaretCircleDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
                         </span>
                       </Listbox.Button>
+                      {errors.account && <span className="text-red-500 text-sm">{errors.account?.message}</span>}
                       <Transition
                         as={Fragment}
                         leave="transition ease-in duration-100"
@@ -115,11 +102,11 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
                         leaveTo="opacity-0"
                       >
                         <Listbox.Options className="z-10 absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                          {userAccounts.map((account, typeIdx) => (
+                          {userAccounts.map((account) => (
                             <Listbox.Option
-                              key={typeIdx}
+                              key={account.id}
                               className={({ active }) =>
-                                `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                                `relative cursor-default select-none py-2 pl-4 pr-4 ${
                                   active ? 'bg-yellow-400 text-amber-900' : 'text-gray-900'
                                 }`
                               }
@@ -128,7 +115,7 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
                               {({ selected }) => (
                                 <>
                                   <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                                    {account?.bankAccountType?.name}
+                                    {account?.name} ({account?.currency.code}, {account?.bankAccountType?.name})
                                   </span>
                                   {selected ? (
                                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
@@ -145,7 +132,7 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
                   </Listbox>
 
                   {/* Type */}
-                  <Listbox value={type} onChange={setType}>
+                  <Listbox value={type} onChange={handleTransactionTypeChange}>
                     <div className="relative" id="type">
                       <Listbox.Label className="mb-3">Type</Listbox.Label>
                       <Listbox.Button className="text-white bg-transparent border border-white relative w-full cursor-default rounded-lg py-2 pl-3 pr-10 text-left shadow-md focus:outline-none sm:text-sm">
@@ -154,6 +141,9 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
                           <CaretCircleDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
                         </span>
                       </Listbox.Button>
+                      {errors.transactionType && (
+                        <span className="text-red-500 text-sm">{errors.transactionType?.message}</span>
+                      )}
                       <Transition
                         as={Fragment}
                         leave="transition ease-in duration-100"
@@ -161,7 +151,7 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
                         leaveTo="opacity-0"
                       >
                         <Listbox.Options className="z-10 absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                          {types.map((type, typeIdx) => (
+                          {typeProps.map((type, typeIdx) => (
                             <Listbox.Option
                               key={typeIdx}
                               className={({ active }) =>
@@ -174,7 +164,7 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
                               {({ selected }) => (
                                 <>
                                   <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                                    {type}
+                                    {type.value}
                                   </span>
                                   {selected ? (
                                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
@@ -200,7 +190,6 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
                       type="number"
                       error={errors.amount?.message}
                       className="appearance-none block py-2.5 px-0 w-full text-base text-white bg-transparent border-0 border-b-2 border-gray-300 dark:text-white dark:border-gray-600 dark:focus:border-[#7289DA] focus:outline-none focus:ring-0 focus:border-yellow-400 peer"
-                      placeholder=" "
                       label="Amount"
                       required
                     />
@@ -213,7 +202,6 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
                       error={errors.merchant?.message}
                       className="appearance-none block py-2.5 px-0 w-full text-base text-white bg-transparent border-0 border-b-2 border-gray-300 dark:text-white dark:border-gray-600 dark:focus:border-yellow-400 focus:outline-none focus:ring-0 focus:border-yellow-400 peer"
                       label="Merchant"
-                      required
                     />
                   </div>
 
@@ -232,20 +220,17 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
                   {/* Details */}
                   <div className="relative z-0">
                     <Input
-                      {...register('amount', {
-                        valueAsNumber: true,
-                      })}
+                      {...register('details')}
                       type="text"
-                      error={errors.amount?.message}
+                      error={errors.details?.message}
                       className="appearance-none block py-2.5 px-0 w-full text-base text-white bg-transparent border-0 border-b-2 border-gray-300 dark:text-white dark:border-gray-600 dark:focus:border-yellow-400 focus:outline-none focus:ring-0 focus:border-yellow-400 peer"
-                      placeholder=" "
-                      label="Amount"
-                      required
+                      label="Details"
                     />
                   </div>
 
                   <button
-                    form="addTransaction"
+                    // form="addTransaction"
+                    disabled={isSubmitting}
                     className="col-span-2 disabled:cursor-not-allowed disabled:pointer-events-none w-full text-[#1f1f1f] bg-yellow-400 p-3 rounded-md text-lg uppercase hover:bg-white focus:bg-white focus:outline-none transition-all duration-100 ease-in"
                   >
                     Add

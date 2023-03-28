@@ -22,7 +22,7 @@ const getCardStyles = (type: BankAccountType | ''): { icon: ReactNode; classes: 
     case 'Mortgage': {
       return {
         icon: <CreditCard className="w-5 h-6" />,
-        classes: 'bg-debitCardPattern bg-center bg-cover bg-br',
+        classes: 'bg-debitCardPattern bg-center bg-cover',
       };
     }
 
