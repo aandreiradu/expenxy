@@ -3,6 +3,7 @@ import { BANK_ACCOUNT_TYPES } from '../../components/BankCard';
 
 export type Account = {
   id: string;
+  name: string;
   balance: string;
   bankAccountType: { name: keyof typeof BANK_ACCOUNT_TYPES | '' };
   currency: { name: string; code: string } | Record<string, string>;
@@ -16,6 +17,7 @@ const initialState: IAccountState = {
   accounts: [
     {
       id: '',
+      name: '',
       balance: '',
       bankAccountType: {
         name: '',

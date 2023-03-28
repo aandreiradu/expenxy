@@ -142,7 +142,7 @@ const Account = () => {
             balance={Number(account.balance)}
             currency={account.currency.code}
             type={account.bankAccountType.name}
-            name={account.bankAccountType.name}
+            name={account.name}
           />
         ))}
       </div>
