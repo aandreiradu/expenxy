@@ -104,6 +104,7 @@ export const BankAccountService: IAccount = {
 
     const bankAccount = await prisma.account.create({
       data: {
+        name: args.accountName,
         balance: args.balance,
         currencyId: currencyId,
         bankAccountTypeId: bankAccountTypeId,
@@ -209,6 +210,7 @@ export const BankAccountService: IAccount = {
         select: {
           accounts: {
             select: {
+              name: true,
               balance: true,
               currency: {
                 select: {
