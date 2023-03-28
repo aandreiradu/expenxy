@@ -210,6 +210,7 @@ export const BankAccountService: IAccount = {
         select: {
           accounts: {
             select: {
+              id: true,
               name: true,
               balance: true,
               currency: {
