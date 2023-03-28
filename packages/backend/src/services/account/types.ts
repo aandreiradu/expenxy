@@ -84,6 +84,7 @@ export type CreateBankAccountResValidationErr = {
 /* Return Type Get Accounts Data */
 export type TGetAccountsData = {
   accounts: {
+    id: string;
     name: string;
     balance: Decimal;
     currency: {
