@@ -35,6 +35,7 @@ export const currencyAccountTypes = z.enum(['EUR', 'RON'], {
 export const createBankAccountSchema = z
   .object({
     userId: z.string(),
+    accountName: z.string().min(1),
     accountTypeId: z.string().uuid(),
     currency: z.string().uuid(),
     balance: z.coerce.number().default(0),
@@ -83,6 +84,7 @@ export type CreateBankAccountResValidationErr = {
 /* Return Type Get Accounts Data */
 export type TGetAccountsData = {
   accounts: {
+    name: string;
     balance: Decimal;
     currency: {
       name: string;

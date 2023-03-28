@@ -88,6 +88,7 @@ export const createBankAccountController = async (
       });
     }
     const createAccount = await BankAccountService.createBankAccount({
+      accountName: req.body.accountName,
       balance: req.body.balance,
       currency: req.body.currency,
       accountTypeId: req.body.accountTypeId,
