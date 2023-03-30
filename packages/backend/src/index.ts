@@ -103,8 +103,6 @@ app.use((err: CustomError, req: Request, res: Response<ResponseAPI>, next: NextF
   const { message, status, data, error } = err;
   const statusCode = status ?? 500;
 
-  console.log('error from Error middleware', err);
-
   return res.status(statusCode).send({
     message,
     data: data,

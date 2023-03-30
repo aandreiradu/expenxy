@@ -71,16 +71,18 @@ model Currency {
 }
 
 enum TransactionType {
-  incoming
-  outgoing
+  Expense
+  Income
 }
 
 model Transaction {
-  id     String          @id @default(uuid())
-  type   TransactionType
-  amount Decimal
+  id       String          @id @default(uuid())
+  type     TransactionType
+  amount   Decimal         @db.Decimal(10, 2)
+  date     DateTime        @db.DateTime()
+  details  String?
+  merchant String?
 
-  account Account @relation(fields: [accountId], references: [id])
-
+  account   Account @relation(fields: [accountId], references: [id])
   accountId String
 }
