@@ -95,12 +95,12 @@ export const useHttpRequest = () => {
         withCredentials: withCredentials ? withCredentials : false,
       });
 
-      setTimeout(() => {
-        dispatch({
-          type: ActionTypes.RESPONSE,
-          payload: response.data,
-        });
-      }, 5000);
+      // setTimeout(() => {
+      dispatch({
+        type: ActionTypes.RESPONSE,
+        payload: response.data,
+      });
+      // }, 5000);
 
       response.data.status = response.status;
       return response.data;
