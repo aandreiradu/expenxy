@@ -24,9 +24,7 @@ export const createTransactionController = async (
     const validateSchema = createTransactionSchema.safeParse(req.body);
 
     if (!validateSchema.success) {
-      console.log('validateSchema', validateSchema);
       const flattenErrors = validateSchema.error.flatten();
-      console.log('flattenErrors', flattenErrors);
       const errorObj = {
         status: 400,
         message: 'Error validation',
@@ -40,18 +38,62 @@ export const createTransactionController = async (
       return next(errorObj);
     }
 
-    const transactionId = await TransactionService.createTransaction(req.body);
+    const newTransaction = await TransactionService.createTransaction({
+      ...req.body,
+      userId: req.metadata.userId as string,
+    });
 
-    console.log('transaction created successfully', transactionId);
+    if (newTransaction) {
+      /* Update account balance */
+      await TransactionService.updateBalanceByType(req.body.account, req.body.transactionType, req.body.amount);
 
-    return res.status(201).send({
-      message: 'Transaction created',
-      data: {
-        transactionId,
-      },
+      /* Return latest transactions */
+      const latestTransactions = await TransactionService.getLatestTransactions(req.metadata.userId as string);
+
+      console.log('latestTransactions', latestTransactions);
+
+      return res.status(201).send({
+        message: 'Transaction created',
+        data: {
+          latestTransactions,
+        },
+      });
+    }
+
+    console.log('__Bottom reached createTransactionController');
+    return res.status(500).send({
+      message: 'Something went wrong. Please try again later',
     });
   } catch (error) {
     console.log('ERRROR createTransactionController controller - userId ', req.metadata.userId, error);
+    if (error instanceof Error) {
+      const { message } = error;
+
+      return res.status(500).send({
+        message: message,
+      });
+    }
+
+    return res.status(500).send({
+      message: 'Something went wrong. Please try again later',
+    });
+  }
+};
+
+export const getLatestTransactionsController = async (req: Request, res: Response<IResponse>, next: NextFunction) => {
+  try {
+    const latestTransactions = await TransactionService.getLatestTransactions(req.metadata.userId as string);
+
+    console.log('latestTransactions', latestTransactions);
+
+    return res.status(200).send({
+      message: 'Latest transactions fetched successfully',
+      data: {
+        latestTransactions: latestTransactions,
+      },
+    });
+  } catch (error) {
+    console.log('ERRROR getLatestTransactionsController controller - userId ', req.metadata.userId, error);
     if (error instanceof Error) {
       const { message } = error;
 
