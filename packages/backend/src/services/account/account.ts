@@ -1,6 +1,8 @@
+import { Prisma } from '@prisma/client';
 import { getAccounts } from '../../controllers/account';
 import prisma from '../../utils/prisma';
 import { CreateBankAccountArgs, HasExistingAccountReturn, TGetAccountsData, THasExistingAccount } from './types';
+import { Decimal } from '@prisma/client/runtime';
 
 interface IAccount {
   getBankingProducts(): Promise<{
@@ -20,6 +22,8 @@ interface IAccount {
   needsBankAccount(id: string): Promise<boolean>;
 
   getAccounts(userId: string): Promise<TGetAccountsData | null>;
+
+  getAccountById(accountId: string): Promise<{ balance: unknown; name: string; id: string } | null>;
 }
 
 export const BankAccountService: IAccount = {
@@ -242,6 +246,36 @@ export const BankAccountService: IAccount = {
         throw new Error(message);
       }
 
+      throw new Error('Something went wrong. Please try again later');
+    }
+  },
+
+  async getAccountById(accountId: string) {
+    try {
+      return await prisma.account.findFirst({
+        where: {
+          id: accountId,
+        },
+        select: {
+          balance: true,
+          name: true,
+          id: true,
+        },
+      });
+    } catch (error) {
+      console.log('ERRROR __getAccountById service - accountId ', accountId);
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError || error instanceof Prisma.PrismaClientValidationError) {
+        console.log('ERRROR PRISMA __getAccountById service - accountId ', accountId, error);
+        throw new Error('Something went wrong, please try again later!');
+      }
+
+      if (error instanceof Error) {
+        const { message } = error;
+        throw new Error(message);
+      }
+
+      console.log('ERRROR NOT CHECKED INSTANCES __getAccountById service - accountId ', accountId, error);
       throw new Error('Something went wrong. Please try again later');
     }
   },

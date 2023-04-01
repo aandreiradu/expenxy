@@ -1,6 +1,7 @@
+import { Decimal } from '@prisma/client/runtime';
 import { z } from 'zod';
 
-const zTransactionTypesEnums = z.enum(['Expense', 'Income'], {
+export const zTransactionTypesEnums = z.enum(['Expense', 'Income'], {
   errorMap: (issue) => {
     switch (issue.code) {
       case 'invalid_enum_value':
@@ -14,6 +15,8 @@ const zTransactionTypesEnums = z.enum(['Expense', 'Income'], {
   },
 });
 
+export type TransactionType = z.infer<typeof zTransactionTypesEnums>;
+
 export const createTransactionSchema = z.object({
   account: z.string().uuid(),
   transactionType: zTransactionTypesEnums,
@@ -25,4 +28,16 @@ export const createTransactionSchema = z.object({
   details: z.string().optional(),
 });
 
-export type CreateTransactionArgs = z.infer<typeof createTransactionSchema>;
+export type CreateTransactionArgs = z.infer<typeof createTransactionSchema> & {
+  userId: string;
+};
+
+export type TLatestTransactions = {
+  date: Date;
+  createdAt: Date;
+  amount: Decimal;
+  merchant: string | null;
+  currency: string;
+  currencySymbol: string;
+  accountId: string;
+};
