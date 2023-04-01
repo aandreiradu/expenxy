@@ -76,12 +76,13 @@ enum TransactionType {
 }
 
 model Transaction {
-  id       String          @id @default(uuid())
-  type     TransactionType
-  amount   Decimal         @db.Decimal(10, 2)
-  date     DateTime        @db.DateTime()
-  details  String?
-  merchant String?
+  id        String          @id @default(uuid())
+  type      TransactionType
+  amount    Decimal         @db.Decimal(10, 2)
+  date      DateTime        @db.Timestamp(5)
+  details   String?
+  merchant  String?
+  createdAt DateTime        @default(dbgenerated("(now())")) @db.DateTime(0)
 
   account   Account @relation(fields: [accountId], references: [id])
   accountId String
