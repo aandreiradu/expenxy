@@ -5,7 +5,8 @@ type ExistingBackendMessage =
   | 'fetchBankingProductsEmpty'
   | 'bankAccountCreatedSuccessfully'
   | 'accountCreatedSuccessfully'
-  | 'createTransactionSuccessfully';
+  | 'createTransactionSuccessfully'
+  | 'fetchLatestTransactionsSuccessfully';
 
 type IStatsAndMessages = {
   [K in ExistingBackendMessage]?: {
@@ -43,6 +44,10 @@ const statsAndMaps: IStatsAndMessages = {
     status: 201,
     message: 'Transaction created',
     frontendMessage: 'Transaction created successfully',
+  },
+  fetchLatestTransactionsSuccessfully: {
+    status: 200,
+    message: 'Latest transactions fetched successfully',
   },
 };
 

@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Account from '../../components/Account';
 import MainContent from '../../components/MainContent';
 import MobileNav from '../../components/MobileNavbar';
 import RecentTransactions from '../../components/RecentTransactions';
 import Sidebar from '../../components/Sidebar';
-import { useAppSelector } from '../../store/hooks';
-import { selectAccessToken } from '../../store/User/index.slice';
 import AddTransaction from '../AddTransaction';
 
 export type TShowComponent = {
