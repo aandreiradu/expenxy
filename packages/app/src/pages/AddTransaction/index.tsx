@@ -1,23 +1,24 @@
 import { Fragment, memo, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Dispatch, FC, SetStateAction, useCallback, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Input } from '../../components/Input';
-import { TShowComponent } from '../Home';
 import { addTransactionSchema } from './schema';
 import { AddTransactionProps } from './types';
 import { useHttpRequest } from '../../hooks/useHttp';
 import { Listbox, Transition } from '@headlessui/react';
 import { Check, CaretCircleDown, Warning } from 'phosphor-react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectUserAccounts } from '../../store/Account/index.selector';
 import { TAddTransaction, typeProps } from './types';
 import statsAndMaps from '../../config/statusAndMessagesMap';
 import { TTopLevelNotification } from '../Account/CreateBankAccount/types';
 import TopLevelNotification from '../../components/UI/TopLevelNotification';
 import { PulseLoader } from 'react-spinners';
+import { setLatestTransactions } from '../../store/User/index.slice';
 
 const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowComponent }) => {
+  const dispatch = useDispatch();
   const userAccounts = useSelector(selectUserAccounts);
   const [selected, setSelected] = useState<{ name: string; id: string }>({
     name: '',
@@ -74,9 +75,6 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
   }, []);
 
   const onSubmit: SubmitHandler<AddTransactionProps> = async (data) => {
-    console.log('datatatata', data);
-    console.log('errors', errors);
-
     const response = await sendRequest({
       method: 'POST',
       url: '/addTransaction',
@@ -91,18 +89,19 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
       withCredentials: true,
     });
 
-    console.log('response', response);
-
     if (response) {
-      const { transactionId } = response.data;
+      const { latestTransactions } = response.data;
       const { status, message } = response;
 
-      if (transactionId && message === statsAndMaps['createTransactionSuccessfully']?.message && status === 201) {
+      if (message === statsAndMaps['createTransactionSuccessfully']?.message && status === 201) {
         setTopLevelNotification({
           show: true,
           message: statsAndMaps['createTransactionSuccessfully']?.frontendMessage || 'Transaction created successfully',
           icon: <Check className="w-14 h-8 text-green-400" />,
         });
+
+        /* Save to redux store */
+        dispatch(setLatestTransactions({ latestTransactions: latestTransactions }));
 
         /* Reset to default state */
         reset();
