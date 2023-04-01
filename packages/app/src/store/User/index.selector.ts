@@ -14,3 +14,9 @@ export const selectUserData = createSelector(userState, (state) => {
     fullName: state.fullName,
   };
 });
+
+export const selectLatestTransactions = createSelector(userState, (state) => {
+  return {
+    latestTransactions: state.latestTransactions,
+  };
+});
