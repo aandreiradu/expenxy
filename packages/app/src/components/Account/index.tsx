@@ -10,10 +10,13 @@ import TopLevelNotification from '../UI/TopLevelNotification';
 import { setAccountData } from '../../store/Account/index.slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUserAccounts } from '../../store/Account/index.selector';
+import { accountSelected } from '../../store/User/index.selector';
+import { setAccountSelected } from '../../store/User/index.slice';
 
 const Account = () => {
   const dispatch = useDispatch();
   const userAccounts = useSelector(selectUserAccounts);
+  const selectedAccount = useSelector(accountSelected);
   const [topLevelNotification, setTopLevelNotification] = useState<TTopLevelNotification>({
     show: false,
     message: '',
@@ -69,6 +72,10 @@ const Account = () => {
             return dispatch(setAccountData([]));
           }
 
+          if (!selectedAccount) {
+            /* Set the first  */
+            dispatch(setAccountSelected({ accountId: accountsData.data.accounts[0]?.id }));
+          }
           return dispatch(setAccountData(accountsData.data.accounts));
         }
       }
@@ -136,8 +143,9 @@ const Account = () => {
         <ArrowLeft cursor="pointer" className="w-6 h-6 text-white" onClick={handleArrowsClicks.bind(this, 'right')} />
       </div>
       <div className="w-full overflow-y-auto flex gap-3" ref={carousel}>
-        {userAccounts?.map((account) => (
+        {userAccounts?.map((account, index) => (
           <BankCard
+            accountId={account.id}
             key={`${account.bankAccountType.name} ${account.currency.code}`}
             balance={Number(account.balance)}
             currency={account.currency.code}
