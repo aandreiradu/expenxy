@@ -31,7 +31,7 @@ const useAxiosInterceptors = () => {
           const newAccessToken = await refresh();
           prevRequest.headers['Authorization'] = `EXPENXY ${newAccessToken}`;
           return axiosPrivate(prevRequest);
-        } else if (error.response.status === 401 && !prevRequest?.sent) {
+        } else if (error?.response?.status === 401 && !prevRequest?.sent) {
           const { message } = error?.response.data;
 
           if (message === 'Unauthorized') {
