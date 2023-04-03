@@ -30,7 +30,7 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
     handleSubmit,
     setValue,
     setError,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
   } = useForm<AddTransactionProps>({
     resolver: zodResolver(addTransactionSchema),
