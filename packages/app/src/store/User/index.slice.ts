@@ -10,6 +10,7 @@ export type TTransaction = {
   accountId: string;
   createdAt: string;
   date: string;
+  accountSelected: string;
 };
 
 export interface IUserState {
@@ -19,6 +20,7 @@ export interface IUserState {
   imageUrl?: string | null;
   resetPwToken?: string | null;
   latestTransactions: TTransaction[];
+  accountSelected: string;
 }
 
 const initialState: IUserState = {
@@ -27,6 +29,7 @@ const initialState: IUserState = {
   fullName: null,
   imageUrl: null,
   latestTransactions: [],
+  accountSelected: '',
 };
 
 export const userSlice = createSlice({
@@ -53,8 +56,13 @@ export const userSlice = createSlice({
     setLatestTransactions: (state, action: PayloadAction<{ latestTransactions: TTransaction[] }>) => {
       state.latestTransactions = action.payload.latestTransactions;
     },
+
+    setAccountSelected: (state, action: PayloadAction<{ accountId: string }>) => {
+      state.accountSelected = action.payload.accountId;
+    },
   },
 });
 
-export const { setAccessToken, setResetPwToken, logOut, setAuthData, setLatestTransactions } = userSlice.actions;
+export const { setAccessToken, setResetPwToken, logOut, setAuthData, setLatestTransactions, setAccountSelected } =
+  userSlice.actions;
 export default userSlice.reducer;

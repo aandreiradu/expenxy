@@ -20,3 +20,5 @@ export const selectLatestTransactions = createSelector(userState, (state) => {
     latestTransactions: state.latestTransactions,
   };
 });
+
+export const accountSelected = createSelector(userState, (state) => state.accountSelected);
