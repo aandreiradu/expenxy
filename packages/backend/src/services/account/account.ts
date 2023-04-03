@@ -1,8 +1,6 @@
 import { Prisma } from '@prisma/client';
-import { getAccounts } from '../../controllers/account';
 import prisma from '../../utils/prisma';
 import { CreateBankAccountArgs, HasExistingAccountReturn, TGetAccountsData, THasExistingAccount } from './types';
-import { Decimal } from '@prisma/client/runtime';
 
 interface IAccount {
   getBankingProducts(): Promise<{
@@ -228,6 +226,9 @@ export const BankAccountService: IAccount = {
                   name: true,
                 },
               },
+            },
+            orderBy: {
+              createdAt: 'asc',
             },
           },
         },
