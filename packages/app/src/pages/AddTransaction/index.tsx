@@ -16,6 +16,7 @@ import { TTopLevelNotification } from '../Account/CreateBankAccount/types';
 import TopLevelNotification from '../../components/UI/TopLevelNotification';
 import { PulseLoader } from 'react-spinners';
 import { setLatestTransactions } from '../../store/User/index.slice';
+import { updateAccountBalanceById } from '../../store/Account/index.slice';
 
 const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowComponent }) => {
   const dispatch = useDispatch();
@@ -90,7 +91,7 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
     });
 
     if (response) {
-      const { latestTransactions } = response.data;
+      const { latestTransactions, account } = response.data;
       const { status, message } = response;
 
       if (message === statsAndMaps['createTransactionSuccessfully']?.message && status === 201) {
@@ -102,6 +103,7 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
 
         /* Save to redux store */
         dispatch(setLatestTransactions({ latestTransactions: latestTransactions }));
+        dispatch(updateAccountBalanceById({ accountId: account.id, balance: String(account.balance) }));
 
         /* Reset to default state */
         reset();

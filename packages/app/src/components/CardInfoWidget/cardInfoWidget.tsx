@@ -9,8 +9,6 @@ export interface ICartInfoWidget {
 const CardInfoWidget: FC<ICartInfoWidget> = ({ selectedAccount }) => {
   const accountData = useSelector(selectAccountById(selectedAccount));
 
-  console.log('accountData', accountData);
-
   return (
     <div className="w-full max-w-[250px] h-full flex items-center flex-col flex-1 bg-white">
       <h3 className="text-center text-gray-500 h-1/5 flex items-end mb-3">Card Info</h3>
