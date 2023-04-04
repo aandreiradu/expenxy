@@ -11,3 +11,9 @@ export const selectAccountById = (id: string) => {
     return state.accounts.find((acc) => acc.id === id);
   });
 };
+
+export const selectBalanceEvolutionById = (accountId: string) => {
+  return createSelector(accountState, (state) => {
+    return state.accounts.find((acc) => acc.id === accountId)?.balanceEvolution;
+  });
+};
