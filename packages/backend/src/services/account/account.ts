@@ -1,7 +1,8 @@
 import { Prisma } from '@prisma/client';
 import prisma from '../../utils/prisma';
 import { CreateBankAccountArgs, HasExistingAccountReturn, TGetAccountsData, THasExistingAccount } from './types';
-
+import { type AccountStatuses } from './types';
+import { addYears } from '../../utils/dates';
 interface IAccount {
   getBankingProducts(): Promise<{
     bankingProducts: { name: string; id: string }[];
@@ -22,6 +23,8 @@ interface IAccount {
   getAccounts(userId: string): Promise<TGetAccountsData | null>;
 
   getAccountById(accountId: string): Promise<{ balance: unknown; name: string; id: string } | null>;
+
+  getBalanceEvolution(accountId: string): Promise<any>;
 }
 
 export const BankAccountService: IAccount = {
@@ -102,7 +105,8 @@ export const BankAccountService: IAccount = {
     }
 
     const { id: bankAccountTypeId } = selectedBankingProduct;
-    console.log('selectedBankingProduct', selectedBankingProduct);
+
+    const expiresAt = addYears(new Date(), Number(process.env.EXPENXY_ACCOUNT_EXPIRES_AFTER_YEARS) || 3);
 
     const bankAccount = await prisma.account.create({
       data: {
@@ -111,6 +115,8 @@ export const BankAccountService: IAccount = {
         currencyId: currencyId,
         bankAccountTypeId: bankAccountTypeId,
         userId: args.userId,
+        status: 'Active',
+        expiresAt: expiresAt,
       },
       select: {
         id: true,
@@ -277,6 +283,40 @@ export const BankAccountService: IAccount = {
       }
 
       console.log('ERRROR NOT CHECKED INSTANCES __getAccountById service - accountId ', accountId, error);
+      throw new Error('Something went wrong. Please try again later');
+    }
+  },
+
+  async getBalanceEvolution(accountId: string) {
+    try {
+      const balanceEvolution = await prisma.account_ADT.findMany({
+        where: {
+          accountId: accountId,
+        },
+        select: {
+          balance: true,
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      });
+
+      return balanceEvolution;
+    } catch (error) {
+      console.log('ERRROR getBalanceEvolution service - accountId ', accountId, error);
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError || error instanceof Prisma.PrismaClientValidationError) {
+        console.log('ERRROR PRISMA getBalanceEvolution service - accountId ', accountId, error);
+        throw new Error('Something went wrong, please try again later!');
+      }
+
+      if (error instanceof Error) {
+        const { message } = error;
+        throw new Error(message);
+      }
+
+      console.log('ERRROR NOT CHECKED INSTANCES getBalanceEvolution service - accountId ', accountId, error);
       throw new Error('Something went wrong. Please try again later');
     }
   },

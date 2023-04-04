@@ -45,7 +45,11 @@ export const createTransactionController = async (
 
     if (newTransaction) {
       /* Update account balance */
-      await TransactionService.updateBalanceByType(req.body.account, req.body.transactionType, req.body.amount);
+      const updatedBalance = await TransactionService.updateBalanceByType(
+        req.body.account,
+        req.body.transactionType,
+        req.body.amount,
+      );
 
       /* Return latest transactions */
       const latestTransactions = await TransactionService.getLatestTransactions(req.metadata.userId as string);
@@ -56,6 +60,10 @@ export const createTransactionController = async (
         message: 'Transaction created',
         data: {
           latestTransactions,
+          account: {
+            id: req.body.account,
+            balance: updatedBalance,
+          },
         },
       });
     }

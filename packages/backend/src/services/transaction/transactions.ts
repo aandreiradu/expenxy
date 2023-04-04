@@ -6,7 +6,7 @@ import { BankAccountService } from '../account/account';
 
 export interface ITransaction {
   createTransaction(args: CreateTransactionArgs): Promise<string>;
-  updateBalanceByType(accountId: string, transactionType: TransactionType, amount: number): Promise<void>;
+  updateBalanceByType(accountId: string, transactionType: TransactionType, amount: number): Promise<number | void>;
   getLatestTransactions(userId: string): Promise<TLatestTransactions[] | []>;
 }
 
@@ -66,7 +66,15 @@ const TransactionService: ITransaction = {
             },
           });
 
-          break;
+          await prisma.account_ADT.create({
+            data: {
+              balance: updatedBalance,
+              name: account.name,
+              accountId: accountId,
+            },
+          });
+
+          return updatedBalance;
         }
         case 'Expense': {
           const updatedBalance = Number(balance) - Number(amount);
@@ -80,7 +88,15 @@ const TransactionService: ITransaction = {
             },
           });
 
-          break;
+          await prisma.account_ADT.create({
+            data: {
+              balance: updatedBalance,
+              name: account.name,
+              accountId: accountId,
+            },
+          });
+
+          return updatedBalance;
         }
 
         default: {

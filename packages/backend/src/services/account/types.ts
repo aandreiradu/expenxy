@@ -96,3 +96,19 @@ export type TGetAccountsData = {
     };
   }[];
 };
+
+export const zAccountStatusesEnums = z.enum(['Active', 'Disabled', 'Banned', 'Pending'], {
+  errorMap: (issue) => {
+    switch (issue.code) {
+      case 'invalid_enum_value':
+      case 'invalid_type':
+        return { message: 'Invalid Account Status' };
+
+      default:
+        console.log(`__ Unhandled Account Status`);
+        return { message: 'Invalid Account Status' };
+    }
+  },
+});
+
+export type AccountStatuses = z.infer<typeof zAccountStatusesEnums>;

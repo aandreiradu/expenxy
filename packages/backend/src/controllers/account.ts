@@ -185,6 +185,37 @@ export const getAccounts = async (req: Request, res: Response<IResponse>, next: 
   }
 };
 
+export const getAccountBalanceEvolution = async (
+  req: Request<{}, {}, {}, { accountId: string }>,
+  res: Response<IResponse>,
+  next: NextFunction,
+) => {
+  try {
+    const accountBalances = await BankAccountService.getBalanceEvolution(req.query.accountId);
+
+    return res.status(200).send({
+      message: 'Balance evolution retrieved successfully',
+      data: {
+        accountId: req.query.accountId,
+        balanceEvolution: accountBalances,
+      },
+    });
+  } catch (error) {
+    console.log('ERRROR getAccountBalanceEvolution controller - userId ', req.metadata.userId, error);
+    if (error instanceof Error) {
+      const { message } = error;
+
+      return res.status(500).send({
+        message: message,
+      });
+    }
+
+    return res.status(500).send({
+      message: 'Something went wrong. Please try again later',
+    });
+  }
+};
+
 export const test = async (req: Request<{}, {}, { id: string }>, res: Response<IResponse>, next: NextFunction) => {
   const { id } = req.body;
 
