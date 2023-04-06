@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Account } from '@prisma/client';
+import { Account, Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime';
 
 export const bankAccountTypes = z.enum(['Bank Account', 'Savings', 'Morgage'], {
@@ -94,6 +94,9 @@ export type TGetAccountsData = {
     bankAccountType: {
       name: string;
     };
+    status: string;
+    createdAt: Date;
+    expiresAt: Date;
   }[];
 };
 
@@ -112,3 +115,8 @@ export const zAccountStatusesEnums = z.enum(['Active', 'Disabled', 'Banned', 'Pe
 });
 
 export type AccountStatuses = z.infer<typeof zAccountStatusesEnums>;
+
+export type TGetBalanceEvolution = {
+  balance: Prisma.Decimal;
+  createdAt: Date;
+}[];

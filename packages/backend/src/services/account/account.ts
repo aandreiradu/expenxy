@@ -1,7 +1,12 @@
 import { Prisma } from '@prisma/client';
 import prisma from '../../utils/prisma';
-import { CreateBankAccountArgs, HasExistingAccountReturn, TGetAccountsData, THasExistingAccount } from './types';
-import { type AccountStatuses } from './types';
+import {
+  CreateBankAccountArgs,
+  HasExistingAccountReturn,
+  TGetAccountsData,
+  THasExistingAccount,
+  TGetBalanceEvolution,
+} from './types';
 import { addYears } from '../../utils/dates';
 interface IAccount {
   getBankingProducts(): Promise<{
@@ -24,7 +29,7 @@ interface IAccount {
 
   getAccountById(accountId: string): Promise<{ balance: unknown; name: string; id: string } | null>;
 
-  getBalanceEvolution(accountId: string): Promise<any>;
+  getBalanceEvolution(accountId: string): Promise<TGetBalanceEvolution>;
 }
 
 export const BankAccountService: IAccount = {
@@ -219,6 +224,9 @@ export const BankAccountService: IAccount = {
           accounts: {
             select: {
               id: true,
+              status: true,
+              createdAt: true,
+              expiresAt: true,
               name: true,
               balance: true,
               currency: {
