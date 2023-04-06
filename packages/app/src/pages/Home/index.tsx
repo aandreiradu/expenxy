@@ -34,12 +34,12 @@ const Home = () => {
           setShowComponent={setShowComponent}
         />
         <div className="w-full h-full flex md:gap-14 lg:gap-24 py-3">
-          <div className="flex-1 w-full max-w-xl h-full flex flex-col justify-between">
+          <div className="flex-1 w-full md:max-w-xl h-full flex flex-col justify-between">
             <Account />
             <RecentTransactions />
           </div>
-          <div className="flex-1 w-full max-w-xl h-full flex flex-col justify-between">
-            <div className="relative flex flex-wrap justify-between rounded-md h-52 gap-5">
+          <div className="md:px-4 md:max-w-2xl flex-1 w-full h-full flex flex-col justify-between">
+            <div className="w-full relative flex flex-wrap items-center justify-between rounded-md h-60">
               <BalanceWidget selectedAccount={selectedAccount} />
               <CardInfoWidget selectedAccount={selectedAccount} />
             </div>

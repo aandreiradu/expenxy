@@ -135,7 +135,7 @@ const Account = () => {
     <div
       className="
         relative rounded-md flex gap-5 items-center bg-white px-5
-        w-full max-w-xl h-52
+        w-full max-w-xl h-full md:h-60
         shadow-[rgba(13,_38,_76,_0.19)_0px_9px_20px]
       "
     >
