@@ -193,13 +193,25 @@ export const getAccountBalanceEvolution = async (
   try {
     const accountBalances = await BankAccountService.getBalanceEvolution(req.query.accountId);
 
-    return res.status(200).send({
-      message: 'Balance evolution retrieved successfully',
-      data: {
-        accountId: req.query.accountId,
-        balanceEvolution: accountBalances,
-      },
-    });
+    if (accountBalances) {
+      const categories: number[] = [];
+      const data: number[] = [];
+      accountBalances.forEach((be) => {
+        categories.push(Number(new Date(be.createdAt).getFullYear()));
+        data.push(Number(be.balance));
+      });
+      return res.status(200).send({
+        message: 'Balance evolution retrieved successfully',
+        data: {
+          accountId: req.query.accountId,
+          balanceEvolution: {
+            accountBalances,
+            categories,
+            data: [Math.min(...data), Math.max(...data)],
+          },
+        },
+      });
+    }
   } catch (error) {
     console.log('ERRROR getAccountBalanceEvolution controller - userId ', req.metadata.userId, error);
     if (error instanceof Error) {
