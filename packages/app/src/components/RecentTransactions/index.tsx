@@ -1,17 +1,36 @@
-import { AirplaneTilt } from 'phosphor-react';
+import { AirplaneTilt, Warning } from 'phosphor-react';
 import TransactionItem from './TransactionItem';
 import { selectLatestTransactions } from '../../store/User/index.selector';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHttpRequest } from '../../hooks/useHttp';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import statsAndMaps from '../../config/statusAndMessagesMap';
 import { setLatestTransactions } from '../../store/User/index.slice';
 import Loader from '../Loader';
 import { PropagateLoader } from 'react-spinners';
+import TopLevelNotification from '../UI/TopLevelNotification';
+import { TTopLevelNotification } from '../../pages/Account/CreateBankAccount/types';
+
 const RecentTransactions = () => {
+  const [topLevelNotification, setTopLevelNotification] = useState<TTopLevelNotification>({
+    show: false,
+    message: '',
+    icon: <></>,
+  });
   const dispatch = useDispatch();
   const { sendRequest, isLoading, error } = useHttpRequest();
   const { latestTransactions } = useSelector(selectLatestTransactions);
+
+  useEffect(() => {
+    if (error) {
+      const { message } = error;
+      setTopLevelNotification({
+        show: true,
+        message: message || 'Someting went wrong when fetching your recent transactions',
+        icon: <Warning className="w-14 h-8 text-red-700" />,
+      });
+    }
+  }, [error]);
 
   useEffect(() => {
     const fetchLatestTransactions = async () => {
@@ -42,6 +61,23 @@ const RecentTransactions = () => {
 
   return (
     <div className="relative w-full h-full max-h-[350px] overflow-hidden">
+      {error && topLevelNotification.show && (
+        <TopLevelNotification
+          hasCloseButton={false}
+          dismissAfterXMs={error ? 10000 : 5500}
+          message={topLevelNotification.message}
+          show={topLevelNotification.show}
+          onClose={() =>
+            setTopLevelNotification({
+              show: false,
+              message: '',
+              icon: <></>,
+            })
+          }
+          icon={topLevelNotification.icon}
+        />
+      )}
+
       <div className="sticky top-0 left-0 w-full flex justify-between items-center py-3">
         <p className="text-black font-bold text-lg">Recent Transactions</p>
         {latestTransactions?.length > 0 && (

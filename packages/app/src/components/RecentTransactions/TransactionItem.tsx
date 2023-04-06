@@ -17,7 +17,7 @@ const TransactionItem = ({ amount, currency, date, merchant, merchantLogoUrl }: 
         <p className="text-xs font-extralight">{date}</p>
       </div>
       <div className="ml-auto mr-4 flex items-center">
-        <span className="text-xs mt-auto pb-[2px] font-semibold">{currency}</span>
+        <span className="text-xs mt-auto pb-[2px] mr-0.5 font-semibold">{currency}</span>
         <p className="text-lg font-bold">{amount}</p>
       </div>
     </div>
