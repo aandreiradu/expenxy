@@ -10,9 +10,14 @@ export type Account = {
   id: string;
   name: string;
   balance: string;
+  status: string;
+  createdAt: string;
+  expiresAt: string;
   bankAccountType: { name: keyof typeof BANK_ACCOUNT_TYPES | '' };
   currency: { name: string; code: string } | Record<string, string>;
   balanceEvolution: BalanceEvolution[];
+  balanceEvolutionCategoriesData: number[];
+  balanceEvolutionDates: number[];
 };
 
 export interface IAccountState {
@@ -24,12 +29,17 @@ const initialState: IAccountState = {
     {
       id: '',
       name: '',
+      createdAt: '',
+      expiresAt: '',
+      status: '',
       balance: '',
       bankAccountType: {
         name: '',
       },
       currency: {},
       balanceEvolution: [],
+      balanceEvolutionCategoriesData: [],
+      balanceEvolutionDates: [],
     },
   ],
 };
@@ -54,13 +64,23 @@ export const accountSlice = createSlice({
       }
     },
 
-    setBalanceEvolutionById: (state, action: PayloadAction<{ accountId: string; balanceEvolution: BalanceEvolution[] }>) => {
-      const { accountId, balanceEvolution } = action.payload;
+    setBalanceEvolutionById: (
+      state,
+      action: PayloadAction<{
+        accountId: string;
+        balanceEvolution: BalanceEvolution[];
+        balanceEvolutionCategoriesData: number[];
+        balanceEvolutionDates: number[];
+      }>,
+    ) => {
+      const { accountId, balanceEvolution, balanceEvolutionCategoriesData, balanceEvolutionDates } = action.payload;
 
       const account = state.accounts.find((acc) => acc.id === accountId);
 
       if (account) {
         account.balanceEvolution = balanceEvolution;
+        account.balanceEvolutionCategoriesData = balanceEvolutionCategoriesData;
+        account.balanceEvolutionDates = balanceEvolutionDates;
       }
     },
   },

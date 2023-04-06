@@ -17,3 +17,17 @@ export const selectBalanceEvolutionById = (accountId: string) => {
     return state.accounts.find((acc) => acc.id === accountId)?.balanceEvolution;
   });
 };
+
+export const selectBalanceEvolutionWidgetData = (accountId: string) => {
+  return createSelector(accountState, (state) => {
+    const account = state.accounts.find((acc) => acc.id === accountId);
+
+    if (account) {
+      return {
+        balanceEvolutionCategoriesData: account.balanceEvolutionCategoriesData,
+        balanceEvolutionDates: account.balanceEvolutionDates,
+        balanceEvoluton: account.balanceEvolution,
+      };
+    }
+  });
+};
