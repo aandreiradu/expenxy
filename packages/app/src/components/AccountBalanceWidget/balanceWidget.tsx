@@ -180,7 +180,7 @@ const BalanceWidget: FC<IBalanceWidget> = ({ selectedAccount }) => {
   }
 
   return (
-    <div className="w-full max-w-[300px] h-full flex items-center flex-col flex-1 p-2 bg-white rounded-md shadow-[rgba(13,_38,_76,_0.19)_0px_9px_20px]">
+    <div className="w-full max-w-[300px] h-full flex items-center flex-col flex-1 p-2 bg-white /*rounded-md shadow-[rgba(13,_38,_76,_0.19)_0px_9px_20px]*/">
       {error && topLevelNotification.show && (
         <TopLevelNotification
           hasCloseButton={false}
@@ -206,7 +206,7 @@ const BalanceWidget: FC<IBalanceWidget> = ({ selectedAccount }) => {
           ) ??
             0)}
       </p>
-      <Chart height="175px" options={widgetData.options} series={widgetData.series} type="area" />
+      <Chart height="175px" width="275px" options={widgetData.options} series={widgetData.series} type="area" />
     </div>
   );
 };

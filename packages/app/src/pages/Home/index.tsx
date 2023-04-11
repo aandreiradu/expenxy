@@ -39,7 +39,7 @@ const Home = () => {
             <RecentTransactions />
           </div>
           <div className="md:px-4 md:max-w-2xl flex-1 w-full h-full flex flex-col justify-between">
-            <div className="w-full relative flex flex-wrap items-center justify-between rounded-md h-60">
+            <div className="w-full relative flex overflow-y-auto 2xl:overflow-y-hidden flex-wrap 2xl:flex-nowrap gap-3 items-center justify-between rounded-md h-60">
               <BalanceWidget selectedAccount={selectedAccount} />
               <CardInfoWidget selectedAccount={selectedAccount} />
             </div>

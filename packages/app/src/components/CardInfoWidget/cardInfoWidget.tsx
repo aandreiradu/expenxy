@@ -12,7 +12,7 @@ const CardInfoWidget: FC<ICartInfoWidget> = ({ selectedAccount }) => {
   console.log('accountData', accountData);
 
   return (
-    <div className="w-full max-w-[275px] h-full flex items-center flex-col p-2 flex-1 bg-white rounded-md shadow-[rgba(13,_38,_76,_0.19)_0px_9px_20px]">
+    <div className="w-full max-w-[300px] h-full flex items-center flex-col p-2 flex-1 bg-white /*rounded-md shadow-[rgba(13,_38,_76,_0.19)_0px_9px_20px]*/">
       <h3 className="text-center text-gray-500 flex items-end mb-3">Card Info</h3>
       <div className="w-full h-full flex flex-col gap-2 p-3 overflow-hidden gap-x-2">
         <div className="w-full flex items-start justify-between">
