@@ -4,6 +4,7 @@ import {
   createBankAccountController,
   getAccounts,
   getAccountBalanceEvolution,
+  getAccountOverview,
 } from '../../controllers/account';
 
 const router = Router();
@@ -15,5 +16,7 @@ router.post('/createBankAccount', createBankAccountController);
 router.get('/getAccounts', getAccounts);
 
 router.get('/getBalanceEvolution', getAccountBalanceEvolution);
+
+router.get('/accountOverview', getAccountOverview);
 
 export default router;

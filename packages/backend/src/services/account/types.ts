@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { Account, Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime';
+import { TransactionType } from '../transaction/types';
 
 export const bankAccountTypes = z.enum(['Bank Account', 'Savings', 'Morgage'], {
   errorMap: (issue) => {
@@ -120,3 +121,15 @@ export type TGetBalanceEvolution = {
   balance: Prisma.Decimal;
   createdAt: Date;
 }[];
+
+export type AccountOverviewFilter = 'THIS MONTH' | 'LAST MONTH' | 'ALL' | 'LAST SIX MONTHS';
+
+export type AccountOverviewReturn = {
+  AccountName: string;
+  AccountBalance: number;
+  IncomesTotal: number;
+  ExpensesTotal: number;
+  TotalSum: number;
+  ExpensesPercentage: number;
+  IncomesPercentage: number;
+};

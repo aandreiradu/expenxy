@@ -6,8 +6,12 @@ import {
   TGetAccountsData,
   THasExistingAccount,
   TGetBalanceEvolution,
+  AccountOverviewFilter,
+  AccountOverviewReturn,
 } from './types';
 import { addYears } from '../../utils/dates';
+import db from '../../config/database';
+
 interface IAccount {
   getBankingProducts(): Promise<{
     bankingProducts: { name: string; id: string }[];
@@ -30,6 +34,8 @@ interface IAccount {
   getAccountById(accountId: string): Promise<{ balance: unknown; name: string; id: string } | null>;
 
   getBalanceEvolution(accountId: string): Promise<TGetBalanceEvolution>;
+
+  getAccountOverview(accountId: string, filter: AccountOverviewFilter): Promise<AccountOverviewReturn>;
 }
 
 export const BankAccountService: IAccount = {
@@ -318,6 +324,65 @@ export const BankAccountService: IAccount = {
         console.log('ERRROR PRISMA getBalanceEvolution service - accountId ', accountId, error);
         throw new Error('Something went wrong, please try again later!');
       }
+
+      if (error instanceof Error) {
+        const { message } = error;
+        throw new Error(message);
+      }
+
+      console.log('ERRROR NOT CHECKED INSTANCES getBalanceEvolution service - accountId ', accountId, error);
+      throw new Error('Something went wrong. Please try again later');
+    }
+  },
+  async getAccountOverview(accountId: string, filter: AccountOverviewFilter) {
+    console.log('getAccountOverview received', { accountId, filter });
+
+    try {
+      const sqlParams = [accountId, filter, filter, filter, filter];
+      const sql = `
+              set @income = 0,@expense = 0, @sum = 0;
+              set @beginThisMonth := date_add(date_add(LAST_DAY(now()),interval 1 DAY),interval -1 MONTH);
+              set @endThisMonth := LAST_DAY(now());
+              set @beginLastMonth := DATE_ADD(LAST_DAY(DATE_SUB(NOW(), INTERVAL 2 MONTH)), INTERVAL 1 DAY);
+              set @endLastMonth := LAST_DAY(DATE_SUB(NOW(), INTERVAL 1 MONTH));
+              set @beginPastSixMonths := DATE_ADD(LAST_DAY(DATE_SUB(NOW(), INTERVAL 7 MONTH)), INTERVAL 1 DAY);
+    
+              select
+                acc.name as 'AccountName',
+                acc.balance as 'AccountBalance',
+                @income := SUM(CASE WHEN tr.type = 'Income' then tr.amount end) as 'IncomesTotal',
+                @expense := SUM(CASE WHEN tr.type = 'Expense' then tr.amount end) as 'ExpensesTotal',
+                @sum := SUM(CASE WHEN tr.type = 'Expense' then - + tr.amount else tr.amount end) as 'TotalSum',
+                round((@expense / acc.balance) * 100,2) as 'ExpensesPercentage',
+                round((@income / acc.balance) * 100,2) as 'IncomesPercentage'
+              from Account as  acc
+              left join Transaction as tr
+              on acc.id = tr.accountId
+              where acc.id = ?
+              and CASE
+                  WHEN ? = 'THIS MONTH' THEN tr.date between @beginMonth and @endMonth
+                  WHEN ? = 'LAST MONTH' THEN tr.date between @beginLastMonth  AND @endLastMonth
+                        WHEN ? = 'LAST SIX MONTHS' THEN tr.date between @beginPastSixMonths  AND NOW()
+                        WHEN ? = 'ALL' THEN tr.date between (SELECT min(date) from Transaction where accountId = acc.id) and NOW()
+                        ELSE tr.date
+                END
+              group by acc.id,acc.name,acc.name
+              order by acc.id,acc.name,acc.name ASC;
+      `;
+
+      return new Promise((resolve, reject) => {
+        db.query(sql, sqlParams, function (err, result) {
+          if (err) {
+            reject(err);
+          }
+
+          console.log('result', result);
+          console.log('hm2', { ...result[result.length - 1][0] });
+          resolve({ ...result[result.length - 1][0] });
+        });
+      });
+    } catch (error) {
+      console.log('ERRROR getAccountOverview service - accountId ', accountId, error);
 
       if (error instanceof Error) {
         const { message } = error;
