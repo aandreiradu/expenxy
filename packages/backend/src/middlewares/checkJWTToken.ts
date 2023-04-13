@@ -26,8 +26,6 @@ const checkJWTToken = (req: Request, res: Response<ResponseAPI>, next: NextFunct
     return res.status(401).send({
       message: 'Unauthorized',
     });
-  } else {
-    console.log('am auth header', authHeader);
   }
   const accessToken = (authHeader as string).split(' ')[1];
 

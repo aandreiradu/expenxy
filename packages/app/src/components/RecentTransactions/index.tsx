@@ -81,7 +81,7 @@ const RecentTransactions = () => {
       <div className="sticky top-0 left-0 w-full flex justify-between items-center py-3">
         <p className="text-black font-bold text-lg">Recent Transactions</p>
         {latestTransactions?.length > 0 && (
-          <span className="cursor-pointer relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-gray-400 px-5 leading-7 text-[12px] text-gray-400">
+          <span className="w-fit text-xl cursor-pointer relative after:content-[''] after:absolute after:w-full after:bottom-0 after:left-0 after:h-[2px] after:bg-gray-400 px-5 leading-7 text-[12px] text-gray-400 after:hover:w-full after:hover:animate-growingWidth after:focus:w-full after:focus:animate-growingWidth after:hover:bg-yellow-400">
             View All
           </span>
         )}
