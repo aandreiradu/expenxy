@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, Outlet } from 'react-router-dom';
-import { selectAccessToken } from '../../store/User/index.slice';
+import { selectAccessToken } from '../../store/User/index.selector';
 import useRefreshToken from '../../hooks/useRefreshToken';
 
 import axios from 'axios';

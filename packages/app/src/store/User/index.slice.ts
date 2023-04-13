@@ -1,12 +1,26 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
+export type TTransaction = {
+  transactionId: string;
+  amount: string;
+  merchant: string;
+  currency: string;
+  currencySymbol: string;
+  accountId: string;
+  createdAt: string;
+  date: string;
+  accountSelected: string;
+};
+
 export interface IUserState {
   accessToken?: string | null;
   username?: string | null;
   fullName?: string | null;
   imageUrl?: string | null;
   resetPwToken?: string | null;
+  latestTransactions: TTransaction[];
+  accountSelected: string;
 }
 
 const initialState: IUserState = {
@@ -14,16 +28,15 @@ const initialState: IUserState = {
   username: null,
   fullName: null,
   imageUrl: null,
+  latestTransactions: [],
+  accountSelected: '',
 };
 
 export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setAuthData: (
-      state,
-      action: PayloadAction<{ accessToken: string; username: string }>,
-    ) => {
+    setAuthData: (state, action: PayloadAction<{ accessToken: string; username: string }>) => {
       const { accessToken, username } = action.payload;
 
       state.accessToken = accessToken;
@@ -33,42 +46,23 @@ export const userSlice = createSlice({
     setAccessToken: (state, action: PayloadAction<{ accessToken: string }>) => {
       state.accessToken = action.payload.accessToken;
     },
-    setResetPwToken: (
-      state,
-      action: PayloadAction<{ resetPwToken: string }>,
-    ) => {
+    setResetPwToken: (state, action: PayloadAction<{ resetPwToken: string }>) => {
       state.resetPwToken = action.payload.resetPwToken;
     },
     logOut: (state) => {
       state.accessToken = null;
     },
+
+    setLatestTransactions: (state, action: PayloadAction<{ latestTransactions: TTransaction[] }>) => {
+      state.latestTransactions = action.payload.latestTransactions;
+    },
+
+    setAccountSelected: (state, action: PayloadAction<{ accountId: string }>) => {
+      state.accountSelected = action.payload.accountId;
+    },
   },
 });
 
-export const { setAccessToken, setResetPwToken, logOut, setAuthData } =
+export const { setAccessToken, setResetPwToken, logOut, setAuthData, setLatestTransactions, setAccountSelected } =
   userSlice.actions;
 export default userSlice.reducer;
-
-interface State {
-  user: IUserState;
-}
-
-// Selectors
-const userState = (state: State) => state.user;
-
-export const selectAccessToken = createSelector(
-  userState,
-  (state) => state.accessToken,
-);
-
-export const selectResetToken = createSelector(
-  userState,
-  (state) => state.resetPwToken,
-);
-
-export const selectUserData = createSelector(userState, (state) => {
-  return {
-    username: state.username,
-    fullName: state.fullName,
-  };
-});

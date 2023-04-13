@@ -1,10 +1,17 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
-import userSlice from './User/index.slice';
+import accountSlice, { IAccountState } from './Account/index.slice';
+import userSlice, { IUserState } from './User/index.slice';
+
+export interface IState {
+  user: IUserState;
+  account: IAccountState;
+}
 
 export const store = configureStore({
   reducer: {
     user: userSlice,
+    account: accountSlice,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
 });

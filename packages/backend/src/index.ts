@@ -14,6 +14,7 @@ import testRoutes from './routes/test';
 import { Prisma } from '@prisma/client';
 import { AuthService } from './services/auth/auth';
 import jwt, { TokenExpiredError } from 'jsonwebtoken';
+import { getAccountOverview } from './controllers/account';
 
 const app = express();
 
@@ -58,32 +59,6 @@ app.use(authRoutes);
 //   }
 // });
 
-app.post('/test', (req, res, next) => {
-  try {
-    if (!req.body.refreshToken) {
-      console.log('generate token');
-      const refreshToken = jwt.sign({ userId: 123 }, process.env.EXPENXY_LOGIN_REFRESH_EXPIRATION_PARAM!, {
-        expiresIn: '1s',
-      });
-
-      return res.status(200).send(refreshToken);
-    } else {
-      console.log('verify token');
-      const decoded = jwt.verify(req.body.refreshToken, process.env.EXPENXY_LOGIN_REFRESH_EXPIRATION_PARAM!);
-      return res.status(200).send(decoded);
-    }
-  } catch (error) {
-    if (error instanceof TokenExpiredError) {
-      const error = {
-        status: 400,
-        message: 'Token expired boss',
-      };
-
-      return next(error);
-    }
-  }
-});
-
 app.use(checkJWTToken);
 
 app.use(accountRoutes);
@@ -102,8 +77,6 @@ app.use((err: CustomError, req: Request, res: Response<ResponseAPI>, next: NextF
 
   const { message, status, data, error } = err;
   const statusCode = status ?? 500;
-
-  console.log('error from Error middleware', err);
 
   return res.status(statusCode).send({
     message,

@@ -33,12 +33,21 @@ model Session {
   userId String?
 }
 
+enum AccountStatus {
+  Active
+  Disabled
+  Banned
+  Pending
+}
+
 model Account {
-  id         String   @id @default(uuid())
-  name       String   @db.VarChar(50)
-  balance    Decimal  @db.Decimal(10, 0)
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @default(now())
+  id         String        @id @default(uuid())
+  name       String        @db.VarChar(50)
+  balance    Decimal       @db.Decimal(10, 0)
+  createdAt  DateTime      @default(now())
+  expiresAt  DateTime
+  modifiedAt DateTime      @default(now())
+  status     AccountStatus @default(Active)
 
   userId String
   User   User   @relation(fields: [userId], references: [id])
@@ -50,6 +59,18 @@ model Account {
   bankAccountTypeId String
 
   Transaction Transaction[]
+  Account_ADT Account_ADT[]
+}
+
+model Account_ADT {
+  id         String   @id @default(uuid())
+  name       String   @db.VarChar(50)
+  balance    Decimal  @db.Decimal(10, 0)
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @default(now())
+
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
 }
 
 model BankAccountType {
@@ -71,16 +92,19 @@ model Currency {
 }
 
 enum TransactionType {
-  incoming
-  outgoing
+  Expense
+  Income
 }
 
 model Transaction {
-  id     String          @id @default(uuid())
-  type   TransactionType
-  amount Decimal
+  id        String          @id @default(uuid())
+  type      TransactionType
+  amount    Decimal         @db.Decimal(10, 2)
+  date      DateTime        @db.Timestamp(5)
+  details   String?
+  merchant  String?
+  createdAt DateTime        @default(dbgenerated("(now())")) @db.DateTime(0)
 
-  account Account @relation(fields: [accountId], references: [id])
-
+  account   Account @relation(fields: [accountId], references: [id])
   accountId String
 }

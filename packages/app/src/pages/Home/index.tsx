@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import Account from '../../components/Account';
 import MainContent from '../../components/MainContent';
 import MobileNav from '../../components/MobileNavbar';
 import RecentTransactions from '../../components/RecentTransactions';
 import Sidebar from '../../components/Sidebar';
-import { useHttpRequest } from '../../hooks/useHttp';
-import { useAppSelector } from '../../store/hooks';
-import { selectAccessToken } from '../../store/User/index.slice';
 import AddTransaction from '../AddTransaction';
+import BalanceWidget from '../../components/AccountBalanceWidget';
+import ExpensesWidget from '../../components/AccountOverviewWidget';
+import CardInfoWidget from '../../components/CardInfoWidget/cardInfoWidget';
+import { useSelector } from 'react-redux';
+import { accountSelected } from '../../store/User/index.selector';
 
 export type TShowComponent = {
   show: boolean;
@@ -14,29 +17,11 @@ export type TShowComponent = {
 };
 
 const Home = () => {
-  const { error, isLoading, sendRequest } = useHttpRequest();
+  const selectedAccount = useSelector(accountSelected);
   const [showComponent, setShowComponent] = useState<TShowComponent>({
     show: false,
     componentName: '',
   });
-
-  useEffect(() => {
-    console.log('showComponent', showComponent);
-  }, [showComponent]);
-
-  // useEffect(() => {
-  //   const getBankAccountConfig = async () => {
-  //     const bankingResponse = await sendRequest({
-  //       url: '/getBankingProducts',
-  //       method: 'GET',
-  //       withCredentials: true,
-  //     });
-
-  //     console.log('bankingResponse', bankingResponse);
-  //   };
-
-  //   getBankAccountConfig();
-  // }, []);
 
   return (
     <>
@@ -48,7 +33,19 @@ const Home = () => {
           componentName={showComponent.componentName}
           setShowComponent={setShowComponent}
         />
-        <RecentTransactions />
+        <div className="w-full h-full flex md:gap-14 lg:gap-24 py-3">
+          <div className="flex-1 w-full md:max-w-xl h-full flex flex-col justify-between">
+            <Account />
+            <RecentTransactions />
+          </div>
+          <div className="md:px-4 md:max-w-2xl flex-1 w-full h-full flex flex-col justify-between">
+            <div className="w-full relative flex overflow-y-auto 2xl:overflow-y-hidden flex-wrap 2xl:flex-nowrap gap-3 items-center justify-between rounded-md h-60">
+              <BalanceWidget selectedAccount={selectedAccount} />
+              <CardInfoWidget selectedAccount={selectedAccount} />
+            </div>
+            <ExpensesWidget />
+          </div>
+        </div>
       </MainContent>
     </>
   );

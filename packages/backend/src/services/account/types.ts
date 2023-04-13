@@ -1,6 +1,7 @@
 import { z } from 'zod';
-import { Account } from '@prisma/client';
+import { Account, Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime';
+import { TransactionType } from '../transaction/types';
 
 export const bankAccountTypes = z.enum(['Bank Account', 'Savings', 'Morgage'], {
   errorMap: (issue) => {
@@ -94,5 +95,41 @@ export type TGetAccountsData = {
     bankAccountType: {
       name: string;
     };
+    status: string;
+    createdAt: Date;
+    expiresAt: Date;
   }[];
+};
+
+export const zAccountStatusesEnums = z.enum(['Active', 'Disabled', 'Banned', 'Pending'], {
+  errorMap: (issue) => {
+    switch (issue.code) {
+      case 'invalid_enum_value':
+      case 'invalid_type':
+        return { message: 'Invalid Account Status' };
+
+      default:
+        console.log(`__ Unhandled Account Status`);
+        return { message: 'Invalid Account Status' };
+    }
+  },
+});
+
+export type AccountStatuses = z.infer<typeof zAccountStatusesEnums>;
+
+export type TGetBalanceEvolution = {
+  balance: Prisma.Decimal;
+  createdAt: Date;
+}[];
+
+export type AccountOverviewFilter = 'THIS MONTH' | 'LAST MONTH' | 'ALL' | 'LAST SIX MONTHS';
+
+export type AccountOverviewReturn = {
+  AccountName: string;
+  AccountBalance: number;
+  IncomesTotal: number;
+  ExpensesTotal: number;
+  TotalSum: number;
+  ExpensesPercentage: number;
+  IncomesPercentage: number;
 };

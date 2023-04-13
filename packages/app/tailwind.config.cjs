@@ -10,6 +10,9 @@ module.exports = {
       },
       backgroundImage: {
         landing: "url('landing-background.jpg')",
+        savingsCardPattern: "url('./src/assets/savings-card_y.svg')",
+        debitCardPattern: "url('./src/assets/debit-card.jpg')",
+        defaultCardPattern: "url('./src/assets/default-card.jpg')",
       },
       boxShadow: {
         modal: '0 2px 8px rgba(0, 0, 0, 0.26)',

@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { type CreateTransactionArgs, createTransactionSchema, TransactionService } from '../services/transactions';
+import { CreateTransactionArgs } from '../services/transaction/types';
+import { createTransactionSchema } from '../services/transaction/types';
+import TransactionService from '../services/transaction/transactions';
 
 interface IResponse<T = any> {
   message?: string;
@@ -13,87 +15,103 @@ interface IResponse<T = any> {
   };
 }
 
-// export const createTransactionController = async (
-//   req: Request<{}, {}, CreateTransactionArgs>,
-//   res: Response<IResponse>,
-//   next: NextFunction,
-// ) => {
-//   console.log('req.body', req.body);
-//   const result = createTransactionSchema.safeParse(req.body);
-//   console.log('result', result);
-//   if (!result.success) {
-//     const formatted = result.error.flatten();
+export const createTransactionController = async (
+  req: Request<{}, {}, CreateTransactionArgs>,
+  res: Response<IResponse>,
+  next: NextFunction,
+) => {
+  try {
+    const validateSchema = createTransactionSchema.safeParse(req.body);
 
-//     return res.status(422).send({
-//       error: {
-//         message: 'Error validation',
-//         fieldErrors: formatted.fieldErrors,
-//       },
-//     });
-//   }
-// export const createTransactionController = async (
-//   req: Request<{}, {}, CreateTransactionArgs>,
-//   res: Response<IResponse>,
-//   next: NextFunction,
-// ) => {
-//   console.log('req.body', req.body);
-//   const result = createTransactionSchema.safeParse(req.body);
-//   console.log('result', result);
-//   if (!result.success) {
-//     const formatted = result.error.flatten();
+    if (!validateSchema.success) {
+      const flattenErrors = validateSchema.error.flatten();
+      const errorObj = {
+        status: 400,
+        message: 'Error validation',
+        error: {
+          fieldErrors: {
+            ...flattenErrors.fieldErrors,
+          },
+        },
+      };
 
-//   try {
-//     const userId = req.metadata.userId as string;
-//     console.log('userId', userId);
-//     const { amount, merchant, transactionType, date, currency } = req.body;
-//     console.log('req.body', req.body);
+      return next(errorObj);
+    }
 
-//     if (!userId) {
-//       console.log('no user found in metadata');
-//       return res.status(400).send({
-//         message: "Couldn't identify the user",
-//       });
-//     }
+    const newTransaction = await TransactionService.createTransaction({
+      ...req.body,
+      userId: req.metadata.userId as string,
+    });
 
-//     const id = await TransactionService.createTransaction({
-//       amount,
-//       merchant,
-//       transactionType,
-//       currency,
-//       date,
-//       userId,
-//     });
+    if (newTransaction) {
+      /* Update account balance */
+      const updatedBalance = await TransactionService.updateBalanceByType(
+        req.body.account,
+        req.body.transactionType,
+        req.body.amount,
+      );
 
-//     console.log('id createTransactionController', id);
+      /* Return latest transactions */
+      const latestTransactions = await TransactionService.getLatestTransactions(req.metadata.userId as string);
 
-// try {
-//   const userId = req.metadata.userId as string;
-//   console.log('userId', userId);
-//   const { amount, merchant, transactionType, date, currency } = req.body;
-//   console.log('req.body', req.body);
+      console.log('latestTransactions', latestTransactions);
 
-//   if (!userId) {
-//     console.log('no user found in metadata');
-//     return res.status(400).send({
-//       message: "Couldn't identify the user",
-//     });
-//   }
+      return res.status(201).send({
+        message: 'Transaction created',
+        data: {
+          latestTransactions,
+          account: {
+            id: req.body.account,
+            balance: updatedBalance,
+          },
+        },
+      });
+    }
 
-//   const id = await TransactionService.createTransaction({
-//     amount,
-//     merchant,
-//     transactionType,
-//     currency,
-//     date,
-//     userId,
-//   });
+    console.log('__Bottom reached createTransactionController');
+    return res.status(500).send({
+      message: 'Something went wrong. Please try again later',
+    });
+  } catch (error) {
+    console.log('ERRROR createTransactionController controller - userId ', req.metadata.userId, error);
+    if (error instanceof Error) {
+      const { message } = error;
 
-//     return res.status(200).send({
-//       message: 'Transaction created successfully',
-//       data: id,
-//     });
-//   } catch (error) {
-//     console.log('Error addTransaction controller', error);
-//     return next(error);
-//   }
-// };
+      return res.status(500).send({
+        message: message,
+      });
+    }
+
+    return res.status(500).send({
+      message: 'Something went wrong. Please try again later',
+    });
+  }
+};
+
+export const getLatestTransactionsController = async (req: Request, res: Response<IResponse>, next: NextFunction) => {
+  try {
+    const latestTransactions = await TransactionService.getLatestTransactions(req.metadata.userId as string);
+
+    console.log('latestTransactions', latestTransactions);
+
+    return res.status(200).send({
+      message: 'Latest transactions fetched successfully',
+      data: {
+        latestTransactions: latestTransactions,
+      },
+    });
+  } catch (error) {
+    console.log('ERRROR getLatestTransactionsController controller - userId ', req.metadata.userId, error);
+    if (error instanceof Error) {
+      const { message } = error;
+
+      return res.status(500).send({
+        message: message,
+      });
+    }
+
+    return res.status(500).send({
+      message: 'Something went wrong. Please try again later',
+    });
+  }
+};

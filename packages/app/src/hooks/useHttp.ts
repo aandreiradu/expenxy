@@ -111,9 +111,9 @@ export const useHttpRequest = () => {
       dispatch({
         type: ActionTypes.ERROR,
         payload: {
-          status: customError?.response.status || 500,
-          message: customError?.response.data.message,
-          ...customError?.response.data.error,
+          status: customError?.response?.status || 500,
+          message: customError?.response?.data?.message,
+          ...customError?.response?.data?.error,
         },
       });
     }

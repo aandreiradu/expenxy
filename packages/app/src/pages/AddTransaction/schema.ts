@@ -26,11 +26,12 @@ const TransactionTypesEnums = z.enum(['Income', 'Expense'], {
 });
 
 export const addTransactionSchema = z.object({
+  account: z.string().min(1, { message: 'Please select an account' }),
   transactionType: TransactionTypesEnums,
-  amount: z.number().min(1, { message: 'Amount should be greater than 0.' }),
-  merchant: z.string(),
-  currency: CurrencyEnums,
+  amount: z
+    .number()
+    .min(1, { message: 'Amount should be greater than 0. In case of a Expense transaction, just select the Type' }),
+  merchant: z.string().optional(),
   date: z.string(),
+  details: z.string().optional(),
 });
-
-export type AddTransactionProps = z.infer<typeof addTransactionSchema>;

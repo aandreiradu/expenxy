@@ -18,11 +18,11 @@ export const createBankAccountSchema = z
   .object({
     accountName: z.string(),
     currency: z.string(),
-    balance: z.string().default('0'),
-    accountType: z.string().uuid(), //bankAcountTypes,
+    balance: z.coerce.number().default(0),
+    accountTypeId: z.string().uuid(), //bankAcountTypes,
   })
   .superRefine((val, ctx) => {
-    if (parseFloat(val.balance) < parseFloat('-25000')) {
+    if (val.balance < -25000) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Minimum balance value can't be lower than 25.000",

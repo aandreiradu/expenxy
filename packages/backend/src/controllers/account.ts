@@ -6,6 +6,7 @@ import {
   CreateBankAccountResValidationErr,
   createBankAccountSchema,
   type CreateBankAccountArgs,
+  AccountOverviewFilter,
   //type HasExistingAccountReturn,
 } from '../services/account/types';
 import { BankAccountService } from '../services/account/account';
@@ -185,13 +186,80 @@ export const getAccounts = async (req: Request, res: Response<IResponse>, next: 
   }
 };
 
-export const test = async (req: Request<{}, {}, { id: string }>, res: Response<IResponse>, next: NextFunction) => {
-  const { id } = req.body;
+export const getAccountBalanceEvolution = async (
+  req: Request<{}, {}, {}, { accountId: string }>,
+  res: Response<IResponse>,
+  next: NextFunction,
+) => {
+  try {
+    const accountBalances = await BankAccountService.getBalanceEvolution(req.query.accountId);
 
-  const serviceResponse = await BankAccountService.needsBankAccount(id);
-  return res.status(200).send({
-    data: {
-      serviceResponse,
-    },
-  });
+    if (accountBalances) {
+      const categories: number[] = [];
+      const data: number[] = [];
+      accountBalances.forEach((be) => {
+        categories.push(Number(new Date(be.createdAt).getFullYear()));
+        data.push(Number(be.balance));
+      });
+      return res.status(200).send({
+        message: 'Balance evolution retrieved successfully',
+        data: {
+          accountId: req.query.accountId,
+          balanceEvolution: {
+            accountBalances,
+            categories,
+            data: [Math.min(...data), Math.max(...data)],
+          },
+        },
+      });
+    }
+  } catch (error) {
+    console.log('ERRROR getAccountBalanceEvolution controller - userId ', req.metadata.userId, error);
+    if (error instanceof Error) {
+      const { message } = error;
+
+      return res.status(500).send({
+        message: message,
+      });
+    }
+
+    return res.status(500).send({
+      message: 'Something went wrong. Please try again later',
+    });
+  }
+};
+
+export const getAccountOverview = async (
+  req: Request<{}, {}, {}, { overviewFilter: AccountOverviewFilter; accountId: string }>,
+  res: Response<IResponse>,
+  next: NextFunction,
+) => {
+  try {
+    const overviewFilter = req.query.overviewFilter ?? 'THIS MONTH';
+
+    console.log('overviewFilter', overviewFilter);
+
+    const accountOverview = await BankAccountService.getAccountOverview(req.query.accountId, overviewFilter);
+    console.log('accountOverview', accountOverview);
+
+    return res.status(200).send({
+      message: 'success',
+      data: {
+        accountOverview: accountOverview,
+      },
+    });
+  } catch (error) {
+    console.log('ERRROR getAccountBalanceEvolution controller - userId ', req.metadata.userId, error);
+    if (error instanceof Error) {
+      const { message } = error;
+
+      return res.status(500).send({
+        message: message,
+      });
+    }
+
+    return res.status(500).send({
+      message: 'Something went wrong. Please try again later',
+    });
+  }
 };
