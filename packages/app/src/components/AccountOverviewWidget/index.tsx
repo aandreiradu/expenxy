@@ -4,20 +4,25 @@ import { useSelector } from 'react-redux';
 import { accountSelected } from '../../store/User/index.selector';
 import Loader from '../Loader';
 import { PropagateLoader } from 'react-spinners';
+import AccountOverviewHeader from './overviewHeader';
+import { TTopLevelNotification } from '../../pages/Account/CreateBankAccount/types';
+import TopLevelNotification from '../UI/TopLevelNotification';
 
 const ExpensesWidget = () => {
+  const [topLevelNotification, setTopLevelNotification] = useState<TTopLevelNotification>({
+    show: false,
+    message: '',
+    icon: <></>,
+  });
   const [accountOverviewData, setAccountOverviewData] = useState({
     incomesPercentage: 0,
     expensesPercentage: 0,
-    favoriteMerchant: 'test',
+    favoriteMerchant: '',
   });
   const accountSelectedId = useSelector(accountSelected);
-  console.log('accountSelectedId', accountSelectedId);
   const { isLoading, error, sendRequest } = useHttpRequest();
 
   useEffect(() => {
-    console.log('accountSelectedId changed, running effect');
-
     const getAccountOverview = async () => {
       const accountOverviewResponse = await sendRequest({
         method: 'GET',
@@ -28,13 +33,14 @@ const ExpensesWidget = () => {
       console.log('accountOverviewResponse', accountOverviewResponse);
 
       if (accountOverviewResponse) {
-        const { accountOverview } = accountOverviewResponse?.data;
+        const { name, incomes, expenses, merchant } = accountOverviewResponse?.data;
 
-        if (accountOverview) {
+        if (name) {
           setAccountOverviewData((prev) => ({
             ...prev,
-            incomesPercentage: Number(accountOverview.IncomesPercentage || 0),
-            expensesPercentage: Number(accountOverview.ExpensesPercentage || 0),
+            incomesPercentage: Number(incomes.percentage || 0),
+            expensesPercentage: Number(expenses.percentage || 0),
+            favoriteMerchant: merchant.name,
           }));
         }
       }
@@ -49,22 +55,22 @@ const ExpensesWidget = () => {
 
   return (
     <div className="relative w-full h-full max-h-[350px] overflow-hidden">
-      {/* {error && topLevelNotification.show && (
-    <TopLevelNotification
-      hasCloseButton={false}
-      dismissAfterXMs={error ? 10000 : 5500}
-      message={topLevelNotification.message}
-      show={topLevelNotification.show}
-      onClose={() =>
-        setTopLevelNotification({
-          show: false,
-          message: '',
-          icon: <></>,
-        })
-      }
-      icon={topLevelNotification.icon}
-    />
-  )} */}
+      {error && topLevelNotification.show && (
+        <TopLevelNotification
+          hasCloseButton={false}
+          dismissAfterXMs={error ? 10000 : 5500}
+          message={topLevelNotification.message}
+          show={topLevelNotification.show}
+          onClose={() =>
+            setTopLevelNotification({
+              show: false,
+              message: '',
+              icon: <></>,
+            })
+          }
+          icon={topLevelNotification.icon}
+        />
+      )}
 
       <div className="sticky top-0 left-0 w-full flex justify-between items-center py-3">
         <p className="text-black font-bold text-lg">Account Overview</p>
@@ -82,21 +88,26 @@ const ExpensesWidget = () => {
             />
           </div>
         ) : Object.keys(accountOverviewData).length > 0 ? (
-          <div className="w-full h-full bg-red-500 flex flex-col">
-            <div className="w-full flex items-center bg-blue-600">
-              <div className="flex-[2] h-full flex flex-col bg-green-400 p-2 pb-0">
-                <p className="font-bold text-lg">{accountOverviewData.incomesPercentage}%</p>
-                <p className="font-base">Incomes</p>
-              </div>
-              <div className="flex-[1] flex h-full flex-col bg-pink-500 p-2 pb-0">
-                <p className="font-bold text-lg">{accountOverviewData.expensesPercentage}%</p>
-                <p className="font-base">Expenses</p>
-              </div>
-              <div className="flex-[1] flex h-full flex-col bg-amber-500 p-2 pb-0">
-                <p className="font-bold text-lg">{accountOverviewData.favoriteMerchant}</p>
-                <p className="font-base">Favorite Merchant</p>
-              </div>
-            </div>
+          <div className="flex flex-col w-full h-full bg-white">
+            <AccountOverviewHeader
+              EXPENSES={{
+                flexIndex: 2,
+                percentage: accountOverviewData.expensesPercentage,
+                text: 'Expenses',
+              }}
+              INCOMES={{
+                flexIndex: 1,
+                percentage: accountOverviewData.incomesPercentage,
+                text: 'Incomes',
+              }}
+              MERCHANT={{
+                flexIndex: 1,
+                name: accountOverviewData.favoriteMerchant,
+                categoryText: 'Favorite Merchant',
+              }}
+            />
+            {/* <div className="h-[1px] bg-red-500 mt-5"></div> */}
+            <hr className="mt-3 mx-2 md:mt-5 md:mx-4" />
           </div>
         ) : (
           <p className="mt-3 text-base capitalize font-bold">No overview available</p>
