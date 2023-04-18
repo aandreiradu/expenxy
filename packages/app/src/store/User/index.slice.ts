@@ -11,6 +11,7 @@ export type TTransaction = {
   createdAt: string;
   date: string;
   accountSelected: string;
+  transactionType: 'Expense' | 'Income';
 };
 
 export interface IUserState {
