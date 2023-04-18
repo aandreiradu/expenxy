@@ -27,21 +27,9 @@ export const sidebarNavigation: SidebarLinkProps[] = [
     setShowComponent: () => {},
   },
   {
-    href: '/wallet',
-    name: 'Wallet',
-    icon: <Wallet className={sidebarIconClasses} />,
-    setShowComponent: () => {},
-  },
-  {
     href: '/trash',
     icon: <TrashSimple className={sidebarIconClasses} />,
     name: 'Trash',
-    setShowComponent: () => {},
-  },
-  {
-    href: '/calendar',
-    icon: <CalendarBlank className={sidebarIconClasses} />,
-    name: 'Calendar',
     setShowComponent: () => {},
   },
   {
