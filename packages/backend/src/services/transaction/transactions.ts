@@ -133,6 +133,7 @@ const TransactionService: ITransaction = {
         },
         select: {
           id: true,
+          type: true,
           date: true,
           amount: true,
           merchant: true,
@@ -164,6 +165,7 @@ const TransactionService: ITransaction = {
           currencySymbol: tr.account.currency.symbol,
           createdAt: tr.createdAt,
           accountId: tr.account.id,
+          transactionType: tr.type,
         };
       });
     } catch (error) {

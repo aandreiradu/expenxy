@@ -5,7 +5,7 @@ import { Input } from '../../../components/Input';
 import { Select } from '../../../components/Select';
 import { createBankAccountSchema, type CreateBankAcountProps } from './schema';
 import { PropagateLoader } from 'react-spinners';
-import { Warning, Timer, Check } from 'phosphor-react';
+import { Warning, Timer, Check, ArrowBendUpLeft } from 'phosphor-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useHttpRequest } from '../../../hooks/useHttp';
 import statsAndMaps from '../../../config/statusAndMessagesMap';
@@ -202,10 +202,15 @@ const CreateBankAccount: FC<CreateBankAccountProps> = ({ title }) => {
       )}
 
       <section className="relative w-screen h-screen flex flex-col items-center justify-center px-4 ">
-        <img className="absolute top-0 left-0 w-full h-full brightness-[40%]" src="./landing-background.jpg" />
+        <img className=" absolute top-0 left-0 w-full h-full brightness-[40%]" src="./landing-background.jpg" />
 
         {existingAccount && (
-          <BackButton id="backButton" value="Back" onClick={() => navigate(-1)} classNames="bg-red-700 text-white z-10" />
+          <BackButton
+            id="backButton"
+            value={<ArrowBendUpLeft className="w-4 h-4" />}
+            onClick={() => navigate(-1)}
+            classNames="text-white z-10 absolute top-4 left-4 md:top-[40px] md:left-[60px]"
+          />
         )}
 
         {isLoading ? (

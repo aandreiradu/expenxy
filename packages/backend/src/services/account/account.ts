@@ -354,7 +354,19 @@ export const BankAccountService: IAccount = {
                 @expense := SUM(CASE WHEN tr.type = 'Expense' then tr.amount end) as 'ExpensesTotal',
                 @sum := SUM(CASE WHEN tr.type = 'Expense' then - + tr.amount else tr.amount end) as 'TotalSum',
                 round((@expense / acc.balance) * 100,2) as 'ExpensesPercentage',
-                round((@income / acc.balance) * 100,2) as 'IncomesPercentage'
+                round((@income / acc.balance) * 100,2) as 'IncomesPercentage',
+	            (
+                  select 
+                    case
+                      when merchant is null or merchant = '' then 'Unknown'
+                      else merchant
+                    end
+                  from Transaction tr
+                  where tr.accountId = acc.id and tr.type = 'Expense'
+                  group by tr.merchant,tr.date
+                  order by COUNT(merchant),tr.date desc
+                  limit 1
+                )  as 'Merchant'
               from Account as  acc
               left join Transaction as tr
               on acc.id = tr.accountId
@@ -376,8 +388,6 @@ export const BankAccountService: IAccount = {
             reject(err);
           }
 
-          console.log('result', result);
-          console.log('hm2', { ...result[result.length - 1][0] });
           resolve({ ...result[result.length - 1][0] });
         });
       });

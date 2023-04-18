@@ -104,6 +104,7 @@ const RecentTransactions = () => {
               date={new Date(tr.date).toLocaleDateString('ro-RO')}
               merchant={tr.merchant || 'Unknown'}
               merchantLogoUrl={<AirplaneTilt className="h-16 w-16 p-4" />}
+              type={tr.transactionType}
             />
           ))
         ) : (

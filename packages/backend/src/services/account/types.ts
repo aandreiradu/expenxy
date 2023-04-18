@@ -132,4 +132,5 @@ export type AccountOverviewReturn = {
   TotalSum: number;
   ExpensesPercentage: number;
   IncomesPercentage: number;
+  Merchant: string;
 };

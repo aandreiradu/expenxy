@@ -245,7 +245,18 @@ export const getAccountOverview = async (
     return res.status(200).send({
       message: 'success',
       data: {
-        accountOverview: accountOverview,
+        name: accountOverview.AccountName,
+        incomes: {
+          percentage: accountOverview.IncomesPercentage,
+          total: accountOverview.IncomesTotal,
+        },
+        expenses: {
+          percentage: accountOverview.ExpensesPercentage,
+          total: accountOverview.ExpensesTotal,
+        },
+        merchant: {
+          name: accountOverview.Merchant,
+        },
       },
     });
   } catch (error) {
