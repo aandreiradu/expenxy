@@ -1,12 +1,13 @@
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { ComponentPropsWithoutRef } from 'react';
 
-type BackButtonProps = ComponentPropsWithoutRef<'button'> & {
+type BackButtonProps = {
   classNames: string;
   disabled?: boolean;
   id: string;
-  value: string;
+  value: string | ReactNode;
   loading?: boolean;
+  onClick: () => void;
 };
 
 const BackButton: FC<BackButtonProps> = ({ classNames, id, disabled, value, ...props }) => {
