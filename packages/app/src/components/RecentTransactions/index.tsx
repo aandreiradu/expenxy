@@ -12,6 +12,13 @@ import TopLevelNotification from '../UI/TopLevelNotification';
 import { TTopLevelNotification } from '../../pages/Account/CreateBankAccount/types';
 
 const RecentTransactions = () => {
+  const [showTransactionDetails, setShowTransactionDetails] = useState<string>('');
+
+  const openTransactionDetails = (transactionId: string) => {
+    console.log('triggered', transactionId);
+    console.log('showTransactionDetails', showTransactionDetails);
+    transactionId !== showTransactionDetails ? setShowTransactionDetails(transactionId) : setShowTransactionDetails('');
+  };
   const [topLevelNotification, setTopLevelNotification] = useState<TTopLevelNotification>({
     show: false,
     message: '',
@@ -105,6 +112,9 @@ const RecentTransactions = () => {
               merchant={tr.merchant || 'Unknown'}
               merchantLogoUrl={<AirplaneTilt className="h-16 w-16 p-4" />}
               type={tr.transactionType}
+              transactionId={tr.transactionId}
+              showTransactionIdDetails={showTransactionDetails}
+              onTransactionOpen={openTransactionDetails.bind(this, tr.transactionId)}
             />
           ))
         ) : (
