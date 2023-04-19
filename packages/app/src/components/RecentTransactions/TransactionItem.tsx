@@ -26,7 +26,7 @@ const TransactionItem = ({
   onTransactionOpen,
 }: TransactionItemProps) => {
   return (
-    <div className="w-full flex flex-col" onClick={onTransactionOpen}>
+    <div className="w-full flex flex-col">
       <div className="flex bg-white w-full items-center rounded-md cursor-pointer">
         <div className="flex-shrink-0 bg-yellow-200 rounded-md">{merchantLogoUrl}</div>
         <div className="mx-4 flex-1 my-auto bg-white">
@@ -39,13 +39,13 @@ const TransactionItem = ({
             {type === 'Expense' ? -amount : amount}
           </p>
           {transactionId !== showTransactionIdDetails ? (
-            <CaretDown className="h-4 w-4 mx-1" />
+            <CaretDown className="h-4 w-4 mx-1" onClick={onTransactionOpen} />
           ) : (
-            <CaretUp className="h-4 w-4 mx-1" />
+            <CaretUp className="h-4 w-4 mx-1" onClick={onTransactionOpen} />
           )}
         </div>
       </div>
-      {showTransactionIdDetails === transactionId && <TransactionItemDetails />}
+      {showTransactionIdDetails === transactionId && <TransactionItemDetails transactionId={transactionId} />}
     </div>
   );
 };
