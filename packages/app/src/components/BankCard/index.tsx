@@ -51,8 +51,6 @@ const BankCard: FC<BankCard> = ({ balance, currency, name, type, accountId }) =>
   const selectedAccount = useSelector(accountSelected);
   const { classes, icon } = getCardStyles(type);
 
-  console.log('selectedAccount', selectedAccount);
-
   const handleAccountSelect = useCallback(() => {
     dispatch(setAccountSelected({ accountId: accountId }));
   }, []);

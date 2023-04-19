@@ -15,8 +15,6 @@ const RecentTransactions = () => {
   const [showTransactionDetails, setShowTransactionDetails] = useState<string>('');
 
   const openTransactionDetails = (transactionId: string) => {
-    console.log('triggered', transactionId);
-    console.log('showTransactionDetails', showTransactionDetails);
     transactionId !== showTransactionDetails ? setShowTransactionDetails(transactionId) : setShowTransactionDetails('');
   };
   const [topLevelNotification, setTopLevelNotification] = useState<TTopLevelNotification>({
