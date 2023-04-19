@@ -12,3 +12,5 @@ export type TAddTransaction = TShowComponent & {
 export const typeProps: { value: AvailableTypes }[] = [{ value: 'Expense' }, { value: 'Income' }];
 
 export type AddTransactionProps = z.infer<typeof addTransactionSchema>;
+
+export type EditTransactionProps = Pick<AddTransactionProps, 'amount' | 'date' | 'merchant' | 'transactionType'>;

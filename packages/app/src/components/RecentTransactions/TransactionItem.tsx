@@ -1,5 +1,6 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import TransactionItemDetails from './TransactionItemDetails';
+import { CaretDown, CaretUp } from 'phosphor-react';
 
 interface TransactionItemProps {
   merchant: string;
@@ -8,18 +9,25 @@ interface TransactionItemProps {
   currency: string;
   merchantLogoUrl?: ReactNode;
   type: 'Expense' | 'Income';
+  transactionId: string;
+  showTransactionIdDetails: string;
+  onTransactionOpen: () => void;
 }
 
-const TransactionItem = ({ amount, currency, date, merchant, merchantLogoUrl, type }: TransactionItemProps) => {
-  const [showTransactionDetails, setShowTransactionDetails] = useState<boolean>(false);
-
-  const openTransactionDetails = () => {
-    setShowTransactionDetails((prev) => !prev);
-  };
-
+const TransactionItem = ({
+  amount,
+  currency,
+  date,
+  merchant,
+  merchantLogoUrl,
+  type,
+  showTransactionIdDetails,
+  transactionId,
+  onTransactionOpen,
+}: TransactionItemProps) => {
   return (
     <div className="w-full flex flex-col">
-      <div className="flex bg-white w-full items-center rounded-md cursor-pointer" onClick={openTransactionDetails}>
+      <div className="flex bg-white w-full items-center rounded-md cursor-pointer">
         <div className="flex-shrink-0 bg-yellow-200 rounded-md">{merchantLogoUrl}</div>
         <div className="mx-4 flex-1 my-auto bg-white">
           <p className="font-medium">{merchant}</p>
@@ -30,9 +38,14 @@ const TransactionItem = ({ amount, currency, date, merchant, merchantLogoUrl, ty
           <p className={`text-lg font-bold ${type === 'Expense' ? 'text-red-500' : 'text-green-500'}`}>
             {type === 'Expense' ? -amount : amount}
           </p>
+          {transactionId !== showTransactionIdDetails ? (
+            <CaretDown className="h-4 w-4 mx-1" onClick={onTransactionOpen} />
+          ) : (
+            <CaretUp className="h-4 w-4 mx-1" onClick={onTransactionOpen} />
+          )}
         </div>
       </div>
-      {showTransactionDetails && <TransactionItemDetails />}
+      {showTransactionIdDetails === transactionId && <TransactionItemDetails transactionId={transactionId} />}
     </div>
   );
 };
