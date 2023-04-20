@@ -7,7 +7,10 @@ type ExistingBackendMessage =
   | 'accountCreatedSuccessfully'
   | 'createTransactionSuccessfully'
   | 'fetchLatestTransactionsSuccessfully'
-  | 'fetchBalanceEvolutionSuccessfully';
+  | 'fetchBalanceEvolutionSuccessfully'
+  | 'editTransactionErrorValidation'
+  | 'editTransactionSuccess'
+  | 'editTransactionFailed';
 
 type IStatsAndMessages = {
   [K in ExistingBackendMessage]?: {
@@ -53,6 +56,11 @@ const statsAndMaps: IStatsAndMessages = {
   fetchBalanceEvolutionSuccessfully: {
     status: 200,
     message: 'Balance evolution retrieved successfully',
+  },
+  editTransactionSuccess: {
+    status: 200,
+    message: 'Transaction updated',
+    frontendMessage: 'Transaction updated successfully',
   },
 };
 

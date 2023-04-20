@@ -15,6 +15,7 @@ import { Prisma } from '@prisma/client';
 import { AuthService } from './services/auth/auth';
 import jwt, { TokenExpiredError } from 'jsonwebtoken';
 import { getAccountOverview } from './controllers/account';
+import { IResponse } from './controllers/auth';
 
 const app = express();
 
@@ -82,6 +83,17 @@ app.use((err: CustomError, req: Request, res: Response<ResponseAPI>, next: NextF
     message,
     data: data,
     error: error,
+  });
+});
+
+app.use('*', (req: Request, res: Response<IResponse>, next: NextFunction) => {
+  console.log('ROUTE NOT FOUND');
+
+  return res.status(400).send({
+    message: 'Route not found',
+    error: {
+      message: 'Route not found',
+    },
   });
 });
 
