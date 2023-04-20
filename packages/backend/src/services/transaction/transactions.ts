@@ -136,7 +136,7 @@ const TransactionService: ITransaction = {
       if (!isSucess || message !== 'Passed all checks') {
         return {
           isSuccess: false,
-          message: 'Transaction was not updated',
+          message: message || 'Transaction was not updated',
         };
       }
 
@@ -159,7 +159,7 @@ const TransactionService: ITransaction = {
           if (Number(amount) !== args.amount || transactionType !== args.transactionType) {
             console.log('need to update the account balance');
 
-            await this.updateBalanceByType(accountId, args.transactionType, Number(amount));
+            await this.updateBalanceByType(accountId, args.transactionType, args.amount);
             console.log('account balance updated');
           }
         }
