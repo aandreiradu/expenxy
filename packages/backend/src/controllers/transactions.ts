@@ -122,23 +122,26 @@ export const editTransactionController = async (
       return next(errorObj);
     }
 
-    console.log('schema is valid');
     const { isSuccess, message } = await TransactionService.editTransactionById({
       ...req.body,
       transactionId: req.params.transactionId,
       userId: req.metadata.userId as string,
     });
 
-    if (!isSuccess || message !== 'Transaction updated') {
-      console.log('someting went wrong, return 400');
+    if (!isSuccess && message !== 'Transaction updated') {
       return res.status(400).send({
         message: message,
       });
     }
 
-    console.log('all good, return 200');
+    /* Return latest transactions */
+    const latestTransactions = await TransactionService.getLatestTransactions(req.metadata.userId as string);
+
     return res.status(200).send({
       message: message,
+      data: {
+        latestTransactions,
+      },
     });
   } catch (error) {
     console.log('ERRROR createTransactionController controller - userId ', req.metadata.userId, error);
