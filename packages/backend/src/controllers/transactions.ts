@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { CreateTransactionArgs } from '../services/transaction/types';
+import { CreateTransactionArgs, EditTransactionArgs, editTransactionSchema } from '../services/transaction/types';
 import { createTransactionSchema } from '../services/transaction/types';
 import TransactionService from '../services/transaction/transactions';
 
@@ -71,6 +71,74 @@ export const createTransactionController = async (
     console.log('__Bottom reached createTransactionController');
     return res.status(500).send({
       message: 'Something went wrong. Please try again later',
+    });
+  } catch (error) {
+    console.log('ERRROR createTransactionController controller - userId ', req.metadata.userId, error);
+    if (error instanceof Error) {
+      const { message } = error;
+
+      return res.status(500).send({
+        message: message,
+      });
+    }
+
+    return res.status(500).send({
+      message: 'Something went wrong. Please try again later',
+    });
+  }
+};
+
+export const editTransactionController = async (
+  req: Request<{ transactionId: string }, {}, EditTransactionArgs>,
+  res: Response<IResponse>,
+  next: NextFunction,
+) => {
+  const { transactionId } = req.params;
+
+  if (!transactionId) {
+    const errorObj = {
+      status: 400,
+      message: 'Invalid request. Expected transactionId',
+    };
+
+    return next(errorObj);
+  }
+
+  try {
+    const validateSchema = editTransactionSchema.safeParse(req.body);
+
+    if (!validateSchema.success) {
+      const flattenErrors = validateSchema.error.flatten();
+      const errorObj = {
+        status: 400,
+        message: 'Error validation',
+        error: {
+          fieldErrors: {
+            ...flattenErrors.fieldErrors,
+          },
+        },
+      };
+
+      return next(errorObj);
+    }
+
+    console.log('schema is valid');
+    const { isSuccess, message } = await TransactionService.editTransactionById({
+      ...req.body,
+      transactionId: req.params.transactionId,
+      userId: req.metadata.userId as string,
+    });
+
+    if (!isSuccess || message !== 'Transaction updated') {
+      console.log('someting went wrong, return 400');
+      return res.status(400).send({
+        message: message,
+      });
+    }
+
+    console.log('all good, return 200');
+    return res.status(200).send({
+      message: message,
     });
   } catch (error) {
     console.log('ERRROR createTransactionController controller - userId ', req.metadata.userId, error);
