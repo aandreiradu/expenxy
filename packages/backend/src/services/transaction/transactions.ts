@@ -2,8 +2,10 @@ import { Prisma } from '@prisma/client';
 import prisma from '../../utils/prisma';
 import {
   CreateTransactionArgs,
+  DeleteTransactionArgs,
   EditTransactionArgs,
   EditTranscationReturn,
+  UpdateTransactionByType,
   ValidateTransactionArgs,
   ValidateTransactionReturn,
 } from './types';
@@ -13,8 +15,9 @@ import { BankAccountService } from '../account/account';
 export interface ITransaction {
   createTransaction(args: CreateTransactionArgs): Promise<string>;
   editTransactionById(args: EditTransactionArgs): Promise<EditTranscationReturn>;
+  deleteTransactionById(args: DeleteTransactionArgs): Promise<EditTranscationReturn>;
   validateTransaction(args: ValidateTransactionArgs): Promise<ValidateTransactionReturn>;
-  updateBalanceByType(accountId: string, transactionType: TransactionType, amount: number): Promise<number | void>;
+  updateBalanceByType(accountId: string, transactionType: UpdateTransactionByType, amount: number): Promise<number | void>;
   getLatestTransactions(userId: string): Promise<TLatestTransactions[] | []>;
 }
 
@@ -86,15 +89,13 @@ const TransactionService: ITransaction = {
         };
       }
 
-      console.log('transaction', transaction);
       const {
         account: { userId },
       } = transaction;
-      console.log('userId transaction', userId);
       if (!userId || userId !== args.userId) {
         return {
           isSucess: false,
-          message: 'Forbidden. Not allowed to edit other users transactions',
+          message: 'Forbidden. Not allowed to edit / delete other users transactions',
         };
       }
 
@@ -194,7 +195,64 @@ const TransactionService: ITransaction = {
       throw new Error('Something went wrong. Please try again later');
     }
   },
-  async updateBalanceByType(accountId: string, transactionType: TransactionType, amount: number) {
+
+  async deleteTransactionById(args: DeleteTransactionArgs) {
+    const { transactionId, userId } = args;
+
+    try {
+      const { isSucess, message, data } = await this.validateTransaction({ transactionId: transactionId, userId: userId });
+
+      if (!isSucess || message !== 'Passed all checks') {
+        return {
+          isSuccess: false,
+          message: message || 'Transaction was not updated',
+        };
+      }
+
+      if (isSucess && data && message === 'Passed all checks') {
+        /* Delete transaction and update the user balance */
+
+        /* Delete transaction from account */
+        await prisma.transaction.delete({
+          where: {
+            id: transactionId,
+          },
+        });
+        console.log('deleted transaction');
+
+        /* Update account balance */
+        await this.updateBalanceByType(data.accountId, 'Delete', Number(data.amount));
+        console.log('updated account balance');
+
+        return {
+          isSuccess: true,
+          message: 'Transaction deleted',
+        };
+      }
+
+      return {
+        isSuccess: false,
+        message: 'Transaction was not deleted',
+      };
+    } catch (error) {
+      console.log('ERRROR deleteTransactionById service - transactionId ', transactionId, error);
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError || error instanceof Prisma.PrismaClientValidationError) {
+        console.log('ERRROR PRISMA deleteTransactionById service - transactionId ', transactionId, error);
+        throw new Error('Something went wrong, please try again later!');
+      }
+
+      if (error instanceof Error) {
+        const { message } = error;
+        throw new Error(message);
+      }
+
+      console.log('ERRROR NOT CHECKED INSTANCES deleteTransactionById service - transactionId ', transactionId, error);
+      throw new Error('Something went wrong. Please try again later');
+    }
+  },
+
+  async updateBalanceByType(accountId: string, transactionType: UpdateTransactionByType, amount: number) {
     try {
       const account = await BankAccountService.getAccountById(accountId);
 
@@ -247,6 +305,19 @@ const TransactionService: ITransaction = {
           });
 
           return updatedBalance;
+        }
+
+        case 'Delete': {
+          const updatedBalance = Number(balance) - Number(amount);
+
+          await prisma.account.update({
+            where: {
+              id: account.id,
+            },
+            data: {
+              balance: updatedBalance,
+            },
+          });
         }
 
         default: {

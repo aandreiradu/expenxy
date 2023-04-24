@@ -15,7 +15,14 @@ export const zTransactionTypesEnums = z.enum(['Expense', 'Income'], {
   },
 });
 
+type T1 = 'A' | 'B';
+type T2 = `${T1}|C`;
+
+const x: T2 = 'A|C';
+
 export type TransactionType = z.infer<typeof zTransactionTypesEnums>;
+
+export type UpdateTransactionByType = TransactionType | 'Delete';
 
 export const createTransactionSchema = z.object({
   account: z.string().uuid(),
@@ -42,6 +49,11 @@ export type CreateTransactionArgs = z.infer<typeof createTransactionSchema> & {
 };
 
 export type EditTransactionArgs = z.infer<typeof editTransactionSchema> & {
+  transactionId: string;
+  userId: string;
+};
+
+export type DeleteTransactionArgs = {
   transactionId: string;
   userId: string;
 };
