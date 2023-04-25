@@ -6,15 +6,31 @@ import { Fragment } from 'react';
 interface ModalArgs {
   message?: string;
   title?: string;
-  onConfirm: (arg: boolean) => void;
+  hasConfirm: boolean;
+  onConfirm: () => void;
+  onConfirmText?: string;
   show: boolean;
   linkUrl?: string;
+  onClose: () => void;
+  onCloseText?: string;
+  isLoading?: boolean;
 }
 
-const Modal = ({ onConfirm, linkUrl, message, title, show }: ModalArgs) => {
+const Modal = ({
+  hasConfirm,
+  onConfirm,
+  linkUrl,
+  message,
+  title,
+  show,
+  onClose,
+  onCloseText,
+  onConfirmText,
+  isLoading,
+}: ModalArgs) => {
   return (
     <Transition appear show={show} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={() => onConfirm(false)}>
+      <Dialog as="div" className="relative z-10" onClose={() => onClose()}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -46,13 +62,23 @@ const Modal = ({ onConfirm, linkUrl, message, title, show }: ModalArgs) => {
                   <p className="text-sm text-gray-500">{message || ''}</p>
                 </div>
 
-                <div className="mt-4">
+                <div className="mt-4 flex justify-between items-center">
+                  {hasConfirm && (
+                    <button
+                      disabled={isLoading}
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={() => onConfirm()}
+                    >
+                      {onConfirmText || 'Confirm'}
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                    onClick={() => onConfirm(false)}
+                    onClick={() => (hasConfirm ? onClose() : onConfirm())}
                   >
-                    Close
+                    {onCloseText || 'Close'}
                   </button>
                 </div>
               </Dialog.Panel>

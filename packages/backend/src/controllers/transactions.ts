@@ -159,6 +159,58 @@ export const editTransactionController = async (
   }
 };
 
+export const deleteTransactionController = async (
+  req: Request<{ transactionId: string }, {}, {}>,
+  res: Response<IResponse>,
+  next: NextFunction,
+) => {
+  const { transactionId } = req.params;
+
+  if (!transactionId) {
+    const errorObj = {
+      status: 400,
+      message: 'Invalid request. Expected transactionId',
+    };
+
+    return next(errorObj);
+  }
+
+  try {
+    const { isSuccess, message } = await TransactionService.deleteTransactionById({
+      transactionId: transactionId,
+      userId: req.metadata.userId as string,
+    });
+
+    if (!isSuccess && message != 'Transaction deleted') {
+      return res.status(400).send({
+        message: message,
+      });
+    }
+
+    const latestTransactions = await TransactionService.getLatestTransactions(req.metadata.userId as string);
+
+    return res.status(200).send({
+      message: message,
+      data: {
+        latestTransactions,
+      },
+    });
+  } catch (error) {
+    console.log('ERRROR deleteTransactionController controller - userId ', req.metadata.userId, error);
+    if (error instanceof Error) {
+      const { message } = error;
+
+      return res.status(500).send({
+        message: message,
+      });
+    }
+
+    return res.status(500).send({
+      message: 'Something went wrong. Please try again later',
+    });
+  }
+};
+
 export const getLatestTransactionsController = async (req: Request, res: Response<IResponse>, next: NextFunction) => {
   try {
     const latestTransactions = await TransactionService.getLatestTransactions(req.metadata.userId as string);
