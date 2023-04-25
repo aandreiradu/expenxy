@@ -102,7 +102,16 @@ const Register = () => {
   return (
     <AuthLayout title={title} description={description}>
       {/* Show Error Modal */}
-      {error && showModal && <Modal onConfirm={setShowModal} show={showModal} title={'Ooops'} message={error.message} />}
+      {error && showModal && (
+        <Modal
+          hasConfirm={false}
+          onConfirm={() => setShowModal(false)}
+          onClose={() => {}}
+          show={showModal}
+          title={'Ooops'}
+          message={error.message}
+        />
+      )}
 
       {/* Shop Top Level Notification */}
       {topLevelNotification.show && (

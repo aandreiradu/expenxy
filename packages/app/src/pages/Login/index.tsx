@@ -92,7 +92,16 @@ const Login = () => {
 
   return (
     <AuthLayout title={title} description={description}>
-      {error && showModal && <Modal onConfirm={setShowModal} show={showModal} title={'Ooops'} message={error.message} />}
+      {error && showModal && (
+        <Modal
+          hasConfirm={false}
+          onConfirm={() => setShowModal(false)}
+          onClose={() => {}}
+          show={showModal}
+          title={'Ooops'}
+          message={error.message}
+        />
+      )}
 
       <h1 className="text-3xl  font-bold">Welcome to EXPENXY</h1>
       <span className="text-base  py-2">Login into your account</span>

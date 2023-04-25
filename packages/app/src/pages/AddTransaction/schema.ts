@@ -35,3 +35,12 @@ export const addTransactionSchema = z.object({
   date: z.string(),
   details: z.string().optional(),
 });
+
+export const editTransactionSchema = z.object({
+  transactionType: TransactionTypesEnums,
+  amount: z
+    .number()
+    .min(1, { message: 'Amount should be greater than 0. In case of a Expense transaction, just select the Type' }),
+  merchant: z.string().optional(),
+  date: z.string(),
+});

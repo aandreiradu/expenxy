@@ -224,7 +224,7 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
                   {/* Type */}
                   <Listbox value={type} onChange={handleTransactionTypeChange}>
                     <div className="relative" id="type">
-                      <Listbox.Label className={`${errors?.account && 'text-red-500'}`}>Type</Listbox.Label>
+                      <Listbox.Label className={`${errors?.transactionType && 'text-red-500'}`}>Type</Listbox.Label>
                       <Listbox.Button
                         className={`text-white bg-transparent border border-white 
                                                   relative w-full cursor-default rounded-lg 
@@ -329,7 +329,7 @@ const AddTransaction: FC<TAddTransaction> = ({ show, componentName, setShowCompo
                     disabled={isLoading}
                     className="col-span-2 disabled:cursor-not-allowed disabled:pointer-events-none w-full text-[#1f1f1f] bg-yellow-400 p-3 rounded-md text-lg uppercase hover:bg-white focus:bg-white focus:outline-none transition-all duration-100 ease-in"
                   >
-                    {!isLoading ? 'Login' : <PulseLoader color="#1f1f1f" />}
+                    {!isLoading ? 'Add' : <PulseLoader color="#1f1f1f" />}
                   </button>
                 </form>
               </div>
