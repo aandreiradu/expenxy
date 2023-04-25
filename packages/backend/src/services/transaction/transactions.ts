@@ -318,6 +318,8 @@ const TransactionService: ITransaction = {
               balance: updatedBalance,
             },
           });
+
+          break;
         }
 
         default: {
