@@ -6,7 +6,7 @@ import RecentTransactions from '../../components/RecentTransactions';
 import Sidebar from '../../components/Sidebar';
 import AddTransaction from '../AddTransaction';
 import BalanceWidget from '../../components/AccountBalanceWidget';
-import ExpensesWidget from '../../components/AccountOverviewWidget';
+import AccountOverviewWidget from '../../components/AccountOverviewWidget';
 import CardInfoWidget from '../../components/CardInfoWidget/cardInfoWidget';
 import { useSelector } from 'react-redux';
 import { accountSelected } from '../../store/User/index.selector';
@@ -43,7 +43,7 @@ const Home = () => {
               <BalanceWidget selectedAccount={selectedAccount} />
               <CardInfoWidget selectedAccount={selectedAccount} />
             </div>
-            <ExpensesWidget />
+            <AccountOverviewWidget />
           </div>
         </div>
       </MainContent>

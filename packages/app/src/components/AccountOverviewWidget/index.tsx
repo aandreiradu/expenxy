@@ -8,7 +8,7 @@ import AccountOverviewHeader from './overviewHeader';
 import { TTopLevelNotification } from '../../pages/Account/CreateBankAccount/types';
 import TopLevelNotification from '../UI/TopLevelNotification';
 
-const ExpensesWidget = () => {
+const AccountOverviewWidget = () => {
   const [topLevelNotification, setTopLevelNotification] = useState<TTopLevelNotification>({
     show: false,
     message: '',
@@ -49,12 +49,8 @@ const ExpensesWidget = () => {
     getAccountOverview();
   }, [accountSelectedId]);
 
-  useEffect(() => {
-    console.log('accountOverviewData', accountOverviewData);
-  }, [accountOverviewData]);
-
   return (
-    <div className="relative w-full h-full max-h-[350px] overflow-hidden">
+    <div className="relative w-full h-full max-h-[350px] overflow-hidden hidden xl:block">
       {error && topLevelNotification.show && (
         <TopLevelNotification
           hasCloseButton={false}
@@ -74,9 +70,9 @@ const ExpensesWidget = () => {
 
       <div className="sticky top-0 left-0 w-full flex justify-between items-center py-3">
         <p className="text-black font-bold text-lg">Account Overview</p>
-        <span className="w-fit text-xl cursor-pointer relative after:content-[''] after:absolute after:w-full after:bottom-0 after:left-0 after:h-[2px] after:bg-gray-400 px-5 leading-7 text-[12px] text-gray-400 after:hover:w-full after:hover:animate-growingWidth after:focus:w-full after:focus:animate-growingWidth after:hover:bg-yellow-400">
+        {/* <span className="w-fit text-xl cursor-pointer relative after:content-[''] after:absolute after:w-full after:bottom-0 after:left-0 after:h-[2px] after:bg-gray-400 px-5 leading-7 text-[12px] text-gray-400 after:hover:w-full after:hover:animate-growingWidth after:focus:w-full after:focus:animate-growingWidth after:hover:bg-yellow-400">
           This month
-        </span>
+        </span> */}
       </div>
       <div className="relative w-full h-full max-h-[300px] flex flex-col items-center gap-3 overflow-y-auto">
         {isLoading ? (
@@ -91,23 +87,38 @@ const ExpensesWidget = () => {
           <div className="flex flex-col w-full h-full bg-white">
             <AccountOverviewHeader
               EXPENSES={{
-                flexIndex: 2,
-                percentage: accountOverviewData.expensesPercentage,
-                text: 'Expenses',
+                flexIndex: accountOverviewData.expensesPercentage > accountOverviewData.incomesPercentage ? 2 : 1,
+                percentage: accountOverviewData.expensesPercentage || 0,
+                text: 'Expenses' || 'N/A',
               }}
               INCOMES={{
-                flexIndex: 1,
-                percentage: accountOverviewData.incomesPercentage,
+                flexIndex: accountOverviewData.incomesPercentage > accountOverviewData.expensesPercentage ? 2 : 1,
+                percentage: accountOverviewData.incomesPercentage || 0,
                 text: 'Incomes',
               }}
               MERCHANT={{
                 flexIndex: 1,
-                name: accountOverviewData.favoriteMerchant,
-                categoryText: 'Favorite Merchant',
+                name: accountOverviewData.favoriteMerchant || 'N/A' || 'N/A',
+                categoryText: 'Favorite Merchant' || 'N/A',
               }}
             />
-            {/* <div className="h-[1px] bg-red-500 mt-5"></div> */}
-            <hr className="mt-3 mx-2 md:mt-5 md:mx-4" />
+
+            <hr className="mt-5 mb-5 my-3 mx-2 md:mt-12 md:mx-4" />
+
+            <div className="mt-2 md:mt-5 flex w-full items-center px-2">
+              <div className="flex flex-col flex-1 p-2">
+                <p className="text-sm text-gray-400 mb-2 font-bold">Favorite Restaurant</p>
+                <p className="mt-2 text-lg font-bold text-[#1f1f1f]">Amiga Amore</p>
+              </div>
+              <div className="flex flex-col  flex-1 p-2">
+                <p className="text-sm text-gray-400 mb-2 font-bold">Main Transit</p>
+                <p className="mt-2 text-lg font-bold text-[#1f1f1f]">UBER</p>
+              </div>
+              <div className="flex flex-col  flex-1 p-2">
+                <p className="text-sm text-gray-400 mb-2 font-bold">Top Pleasure</p>
+                <p className="mt-2 text-lg font-bold text-[#1f1f1f]">{accountOverviewData.favoriteMerchant || 'N/A'}</p>
+              </div>
+            </div>
           </div>
         ) : (
           <p className="mt-3 text-base capitalize font-bold">No overview available</p>
@@ -117,4 +128,4 @@ const ExpensesWidget = () => {
   );
 };
 
-export default ExpensesWidget;
+export default AccountOverviewWidget;
