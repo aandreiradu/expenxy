@@ -238,3 +238,30 @@ export const getLatestTransactionsController = async (req: Request, res: Respons
     });
   }
 };
+
+export const getDeletedTransactionsController = async (req: Request, res: Response<IResponse>, next: NextFunction) => {
+  try {
+    const deletedTransactions = await TransactionService.getDeletedTransactions(req.metadata.userId as string);
+
+    console.log('deletedTransactions controller', deletedTransactions);
+
+    return res.status(200).send({
+      data: {
+        ...deletedTransactions,
+      },
+    });
+  } catch (error) {
+    console.log('ERRROR getLatestTransactionsController controller - userId ', req.metadata.userId, error);
+    if (error instanceof Error) {
+      const { message } = error;
+
+      return res.status(500).send({
+        message: message,
+      });
+    }
+
+    return res.status(500).send({
+      message: 'Something went wrong. Please try again later',
+    });
+  }
+};

@@ -1,6 +1,12 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
+type OverviewAccount = {
+  expensesPercentage: number;
+  incomesPercentage: number;
+  favoriteMerchant: string;
+};
+
 export type TTransaction = {
   transactionId: string;
   amount: string;
@@ -22,6 +28,7 @@ export interface IUserState {
   resetPwToken?: string | null;
   latestTransactions: TTransaction[];
   accountSelected: string;
+  accountOverview: OverviewAccount | null;
 }
 
 const initialState: IUserState = {
@@ -31,6 +38,7 @@ const initialState: IUserState = {
   imageUrl: null,
   latestTransactions: [],
   accountSelected: '',
+  accountOverview: null,
 };
 
 export const userSlice = createSlice({
@@ -61,9 +69,20 @@ export const userSlice = createSlice({
     setAccountSelected: (state, action: PayloadAction<{ accountId: string }>) => {
       state.accountSelected = action.payload.accountId;
     },
+
+    setAccountOverview: (state, action: PayloadAction<OverviewAccount>) => {
+      state.accountOverview = action.payload;
+    },
   },
 });
 
-export const { setAccessToken, setResetPwToken, logOut, setAuthData, setLatestTransactions, setAccountSelected } =
-  userSlice.actions;
+export const {
+  setAccessToken,
+  setResetPwToken,
+  logOut,
+  setAuthData,
+  setLatestTransactions,
+  setAccountSelected,
+  setAccountOverview,
+} = userSlice.actions;
 export default userSlice.reducer;

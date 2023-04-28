@@ -58,6 +58,16 @@ export type DeleteTransactionArgs = {
   userId: string;
 };
 
+export type InsertDeletedTransactionsArgs = {
+  transactionType: TransactionType;
+  amount: Decimal;
+  details: string;
+  merchant: string;
+  transactionDate: Date;
+  deletedAt: Date;
+  accountId: string;
+};
+
 export type TLatestTransactions = {
   date: Date;
   createdAt: Date;
@@ -74,7 +84,7 @@ export type ValidateTransactionReturn = {
   isSucess: boolean;
   message: string;
   data?: {
-    [key: string]: string;
+    [key: string]: any;
   };
 };
 
@@ -82,3 +92,11 @@ export type EditTranscationReturn = {
   isSuccess: boolean;
   message: string;
 };
+
+export type DeletedTransactionReturn = {
+  id: string;
+  transactionDate: Date;
+  transactionType: TransactionType;
+  merchant: string | null;
+  deletedAt: Date;
+}[];

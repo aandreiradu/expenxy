@@ -3,22 +3,27 @@ import prisma from '../../utils/prisma';
 import {
   CreateTransactionArgs,
   DeleteTransactionArgs,
+  DeletedTransactionReturn,
   EditTransactionArgs,
   EditTranscationReturn,
+  InsertDeletedTransactionsArgs,
   UpdateTransactionByType,
   ValidateTransactionArgs,
   ValidateTransactionReturn,
 } from './types';
 import { TransactionType, TLatestTransactions } from './types';
 import { BankAccountService } from '../account/account';
+import { Decimal } from '@prisma/client/runtime';
 
 export interface ITransaction {
   createTransaction(args: CreateTransactionArgs): Promise<string>;
   editTransactionById(args: EditTransactionArgs): Promise<EditTranscationReturn>;
   deleteTransactionById(args: DeleteTransactionArgs): Promise<EditTranscationReturn>;
+  insertDeletedTransaction(args: InsertDeletedTransactionsArgs): Promise<void>;
   validateTransaction(args: ValidateTransactionArgs): Promise<ValidateTransactionReturn>;
   updateBalanceByType(accountId: string, transactionType: UpdateTransactionByType, amount: number): Promise<number | void>;
   getLatestTransactions(userId: string): Promise<TLatestTransactions[] | []>;
+  getDeletedTransactions(userId: string): Promise<DeletedTransactionReturn>;
 }
 
 const TransactionService: ITransaction = {
@@ -71,6 +76,9 @@ const TransactionService: ITransaction = {
         select: {
           type: true,
           amount: true,
+          date: true,
+          details: true,
+          merchant: true,
           account: {
             select: {
               id: true,
@@ -105,8 +113,11 @@ const TransactionService: ITransaction = {
         message: 'Passed all checks',
         data: {
           amount: String(transaction.amount),
-          transactionType: transaction.type,
-          accountId: transaction.account.id,
+          transactionType: transaction.type ?? '',
+          accountId: transaction.account.id ?? '',
+          details: transaction.details ?? '',
+          merchant: transaction.merchant ?? '',
+          transactionDate: transaction.date ?? '',
         },
       };
     } catch (error) {
@@ -202,6 +213,8 @@ const TransactionService: ITransaction = {
     try {
       const { isSucess, message, data } = await this.validateTransaction({ transactionId: transactionId, userId: userId });
 
+      console.log('data returned from validate', data);
+
       if (!isSucess || message !== 'Passed all checks') {
         return {
           isSuccess: false,
@@ -210,7 +223,24 @@ const TransactionService: ITransaction = {
       }
 
       if (isSucess && data && message === 'Passed all checks') {
-        /* Delete transaction and update the user balance */
+        /* 
+            Delete transaction 
+            Update the user balance 
+            Insert deleted transaction    
+        */
+
+        /* Insert deleted transaction */
+        const { transactionType, transactionDate, amount, details, merchant, accountId } = data;
+
+        await this.insertDeletedTransaction({
+          amount: new Decimal(amount),
+          details: details,
+          merchant: merchant,
+          deletedAt: new Date(),
+          transactionDate: transactionDate,
+          transactionType: transactionType,
+          accountId: accountId,
+        });
 
         /* Delete transaction from account */
         await prisma.transaction.delete({
@@ -218,11 +248,9 @@ const TransactionService: ITransaction = {
             id: transactionId,
           },
         });
-        console.log('deleted transaction');
 
         /* Update account balance */
         await this.updateBalanceByType(data.accountId, 'Delete', Number(data.amount));
-        console.log('updated account balance');
 
         return {
           isSuccess: true,
@@ -248,6 +276,36 @@ const TransactionService: ITransaction = {
       }
 
       console.log('ERRROR NOT CHECKED INSTANCES deleteTransactionById service - transactionId ', transactionId, error);
+      throw new Error('Something went wrong. Please try again later');
+    }
+  },
+
+  async insertDeletedTransaction(args: InsertDeletedTransactionsArgs) {
+    try {
+      await prisma.deletedTransactions.create({
+        data: {
+          transactionType: args.transactionType,
+          amount: args.amount,
+          details: args.details ?? '',
+          merchant: args.merchant ?? '',
+          transactionDate: args.transactionDate,
+          accountId: args.accountId,
+        },
+      });
+    } catch (error) {
+      console.log('ERRROR insertDeletedTransaction service', error);
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError || error instanceof Prisma.PrismaClientValidationError) {
+        console.log('ERRROR PRISMA insertDeletedTransaction service', error);
+        throw new Error('Something went wrong, please try again later!');
+      }
+
+      if (error instanceof Error) {
+        const { message } = error;
+        throw new Error(message);
+      }
+
+      console.log('ERRROR NOT CHECKED INSTANCES insertDeletedTransaction service', error);
       throw new Error('Something went wrong. Please try again later');
     }
   },
@@ -407,6 +465,37 @@ const TransactionService: ITransaction = {
       console.log('ERRROR NOT CHECKED INSTANCES getLatestTransactions service - useriD ', userId, error);
       throw new Error('Something went wrong. Please try again later');
     }
+  },
+
+  async getDeletedTransactions(userId: string) {
+    const deletedTransactions = await prisma.user.findMany({
+      where: {
+        id: userId,
+      },
+      select: {
+        accounts: {
+          select: {
+            DeletedTransactions: {
+              select: {
+                id: true,
+                transactionDate: true,
+                transactionType: true,
+                merchant: true,
+                deletedAt: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (deletedTransactions.length === 0) {
+      console.log('No deleted transactions found for userId', userId);
+      return [];
+    }
+
+    console.log('deletedTransactions', JSON.stringify(deletedTransactions));
+    return deletedTransactions[0].accounts.map((acc) => acc.DeletedTransactions[0]);
   },
 };
 
