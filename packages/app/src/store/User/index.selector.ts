@@ -43,3 +43,5 @@ export const selectTransactionById = (transactionId: string) => {
 };
 
 export const accountSelected = createSelector(userState, (state) => state.accountSelected);
+
+export const selectAccountOverview = createSelector(userState, (state) => state.accountOverview);

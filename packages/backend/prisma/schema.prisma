@@ -58,8 +58,9 @@ model Account {
   bankAccountType   BankAccountType @relation(fields: [bankAccountTypeId], references: [id])
   bankAccountTypeId String
 
-  Transaction Transaction[]
-  Account_ADT Account_ADT[]
+  Transaction         Transaction[]
+  Account_ADT         Account_ADT[]
+  DeletedTransactions DeletedTransactions[]
 }
 
 model Account_ADT {
@@ -104,6 +105,19 @@ model Transaction {
   details   String?
   merchant  String?
   createdAt DateTime        @default(dbgenerated("(now())")) @db.DateTime(0)
+
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
+}
+
+model DeletedTransactions {
+  id              String          @id @default(uuid())
+  transactionType TransactionType
+  amount          Decimal         @db.Decimal(10, 2)
+  details         String?
+  merchant        String?
+  transactionDate DateTime        @db.Timestamp(5)
+  deletedAt       DateTime        @default(dbgenerated("(now())")) @db.DateTime(0)
 
   account   Account @relation(fields: [accountId], references: [id])
   accountId String

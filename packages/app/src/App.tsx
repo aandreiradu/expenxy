@@ -8,6 +8,7 @@ import ResetPassword from './pages/ResetPassword';
 import ResetPasswordEmailSent from './pages/ResetPassword/EmailSent';
 import SetNewPassword from './pages/ResetPassword/SetNewPassword';
 import CreateBankAccount from './pages/Account/CreateBankAccount';
+import DeletedTransactions from './pages/DeletedTransactions';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route element={<Persist />}>
           <Route path="/" element={<Home />} />
           <Route path="/create-bank-account" element={<CreateBankAccount title="Create bank account" />} />
+          <Route path="/deleted-transactions" element={<DeletedTransactions />} />
         </Route>
         <Route path="*" element={<NotFound />} />;
       </Routes>

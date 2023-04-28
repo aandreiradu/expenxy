@@ -1,23 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useHttpRequest } from '../../hooks/useHttp';
-import { useSelector } from 'react-redux';
-import { accountSelected } from '../../store/User/index.selector';
+import { useDispatch, useSelector } from 'react-redux';
+import { accountSelected, selectAccountOverview } from '../../store/User/index.selector';
 import Loader from '../Loader';
 import { PropagateLoader } from 'react-spinners';
 import AccountOverviewHeader from './overviewHeader';
 import { TTopLevelNotification } from '../../pages/Account/CreateBankAccount/types';
 import TopLevelNotification from '../UI/TopLevelNotification';
+import { setAccountOverview } from '../../store/User/index.slice';
 
 const AccountOverviewWidget = () => {
+  const dispatch = useDispatch();
+  const accountOverviewData = useSelector(selectAccountOverview);
   const [topLevelNotification, setTopLevelNotification] = useState<TTopLevelNotification>({
     show: false,
     message: '',
     icon: <></>,
-  });
-  const [accountOverviewData, setAccountOverviewData] = useState({
-    incomesPercentage: 0,
-    expensesPercentage: 0,
-    favoriteMerchant: '',
   });
   const accountSelectedId = useSelector(accountSelected);
   const { isLoading, error, sendRequest } = useHttpRequest();
@@ -26,7 +24,7 @@ const AccountOverviewWidget = () => {
     const getAccountOverview = async () => {
       const accountOverviewResponse = await sendRequest({
         method: 'GET',
-        url: `/accountOverview?overviewFilter=${'THISMONTH'}&accountId=${accountSelectedId}`,
+        url: `/accountOverview?overviewFilter=${'ALL'}&accountId=${accountSelectedId}`,
         withCredentials: true,
       });
 
@@ -36,17 +34,20 @@ const AccountOverviewWidget = () => {
         const { name, incomes, expenses, merchant } = accountOverviewResponse?.data;
 
         if (name) {
-          setAccountOverviewData((prev) => ({
-            ...prev,
-            incomesPercentage: Number(incomes.percentage || 0),
-            expensesPercentage: Number(expenses.percentage || 0),
-            favoriteMerchant: merchant.name,
-          }));
+          dispatch(
+            setAccountOverview({
+              expensesPercentage: Number(incomes.percentage || 0),
+              incomesPercentage: Number(expenses.percentage || 0),
+              favoriteMerchant: merchant.name,
+            }),
+          );
         }
       }
     };
 
-    getAccountOverview();
+    if (!accountOverviewData) {
+      getAccountOverview();
+    }
   }, [accountSelectedId]);
 
   return (
@@ -83,7 +84,7 @@ const AccountOverviewWidget = () => {
               textClasses="text-[#1f1f1f] text-lg  uppercase"
             />
           </div>
-        ) : Object.keys(accountOverviewData).length > 0 ? (
+        ) : accountOverviewData && Object.keys(accountOverviewData).length > 0 ? (
           <div className="flex flex-col w-full h-full bg-white">
             <AccountOverviewHeader
               EXPENSES={{

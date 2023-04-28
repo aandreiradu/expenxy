@@ -1,4 +1,4 @@
-import { GoogleChromeLogo, Wallet, TrashSimple, CalendarBlank, User, Gear, SignOut, Plus, Bank } from 'phosphor-react';
+import { TrashSimple, User, Gear, SignOut, Plus, Bank, House } from 'phosphor-react';
 import SidebarLink from './SidebarLink';
 import type { SidebarLinkProps } from './SidebarLink';
 import { useAppDispatch } from '../../store/hooks';
@@ -7,11 +7,17 @@ import { useHttpRequest } from '../../hooks/useHttp';
 import { logOut } from '../../store/User/index.slice';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../UI/Modal';
-import { TShowComponent } from '../../pages/Home';
 
 const sidebarIconClasses = `w-8 h-8 group-hover:text-white`;
 
 export const sidebarNavigation: SidebarLinkProps[] = [
+  {
+    href: '/',
+    icon: <House className={sidebarIconClasses} />,
+    name: 'Home',
+    setShowComponent: () => {},
+    isLink: true,
+  },
   {
     href: '/add-transaction',
     icon: <Plus className={sidebarIconClasses} />,
@@ -27,7 +33,8 @@ export const sidebarNavigation: SidebarLinkProps[] = [
     setShowComponent: () => {},
   },
   {
-    href: '/trash',
+    isLink: true,
+    href: `/deleted-transactions`,
     icon: <TrashSimple className={sidebarIconClasses} />,
     name: 'Trash',
     setShowComponent: () => {},
@@ -76,7 +83,6 @@ const Sidebar = ({ setShowComponent }: ISidebarProps) => {
       const { message } = response.data;
 
       if ((message === 'Logout completed' && status === 200) || status === 204) {
-        console.log('logout completed');
         dispatch(logOut());
         navigate('/login');
       }
@@ -85,7 +91,6 @@ const Sidebar = ({ setShowComponent }: ISidebarProps) => {
 
   useEffect(() => {
     if (error) {
-      console.log('error login', error);
       setShowModal({
         show: true,
         message: error.message || 'Unexpected error occured',
@@ -100,6 +105,8 @@ const Sidebar = ({ setShowComponent }: ISidebarProps) => {
       {error && showModal && (
         <Modal
           onConfirm={() => setShowModal({ message: '', show: false })}
+          onClose={() => {}}
+          hasConfirm={false}
           show={showModal.show}
           title={'Ooops'}
           message={error.message}

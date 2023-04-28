@@ -7,6 +7,7 @@ module.exports = {
       gridTemplateColumns: {
         '2_20px': 'repeat(2, 12px)',
         'content-main-color': 'linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%)',
+        '150_1fr': 'repeat(auto-fit, minmax(140px, 200px));',
       },
       backgroundImage: {
         landing: "url('landing-background.jpg')",

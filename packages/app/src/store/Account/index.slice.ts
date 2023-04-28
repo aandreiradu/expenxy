@@ -26,21 +26,21 @@ export interface IAccountState {
 
 const initialState: IAccountState = {
   accounts: [
-    {
-      id: '',
-      name: '',
-      createdAt: '',
-      expiresAt: '',
-      status: '',
-      balance: '',
-      bankAccountType: {
-        name: '',
-      },
-      currency: {},
-      balanceEvolution: [],
-      balanceEvolutionCategoriesData: [],
-      balanceEvolutionDates: [],
-    },
+    // {
+    //   id: '',
+    //   name: '',
+    //   createdAt: '',
+    //   expiresAt: '',
+    //   status: '',
+    //   balance: '',
+    //   bankAccountType: {
+    //     name: '',
+    //   },
+    //   currency: {},
+    //   balanceEvolution: [],
+    //   balanceEvolutionCategoriesData: [],
+    //   balanceEvolutionDates: [],
+    // },
   ],
 };
 

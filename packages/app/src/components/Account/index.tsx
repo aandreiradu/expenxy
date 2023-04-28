@@ -81,7 +81,9 @@ const Account = () => {
       }
     };
 
-    getAccountsData();
+    if (userAccounts.length === 0) {
+      getAccountsData();
+    }
   }, []);
 
   /* Errors */
