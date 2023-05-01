@@ -124,4 +124,7 @@ model DeletedTransactions {
   account    Account @relation(fields: [accountId], references: [id])
   accountId  String
   currencyId String
+
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
 }
