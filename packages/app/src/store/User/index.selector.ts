@@ -45,3 +45,9 @@ export const selectTransactionById = (transactionId: string) => {
 export const accountSelected = createSelector(userState, (state) => state.accountSelected);
 
 export const selectAccountOverview = createSelector(userState, (state) => state.accountOverview);
+
+export const selectDeletedTransactions = createSelector(userState, (state) => ({
+  transactionsDeleted: state.deletedTransactions.transactions,
+  transactionsDeletedCount: state.deletedTransactions.totalTransactions,
+  transactionsDeletedPage: state.deletedTransactions.page,
+}));
