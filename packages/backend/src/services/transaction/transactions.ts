@@ -6,12 +6,13 @@ import {
   DeletedTransactionReturn,
   EditTransactionArgs,
   EditTranscationReturn,
+  GetDeletedTransactionsArgs,
   InsertDeletedTransactionsArgs,
   UpdateTransactionByType,
   ValidateTransactionArgs,
   ValidateTransactionReturn,
 } from './types';
-import { TransactionType, TLatestTransactions } from './types';
+import { TLatestTransactions } from './types';
 import { BankAccountService } from '../account/account';
 import { Decimal } from '@prisma/client/runtime';
 
@@ -23,7 +24,7 @@ export interface ITransaction {
   validateTransaction(args: ValidateTransactionArgs): Promise<ValidateTransactionReturn>;
   updateBalanceByType(accountId: string, transactionType: UpdateTransactionByType, amount: number): Promise<number | void>;
   getLatestTransactions(userId: string): Promise<TLatestTransactions[] | []>;
-  getDeletedTransactions(userId: string): Promise<DeletedTransactionReturn>;
+  getDeletedTransactions(args: GetDeletedTransactionsArgs): Promise<DeletedTransactionReturn>;
 }
 
 const TransactionService: ITransaction = {
@@ -83,6 +84,7 @@ const TransactionService: ITransaction = {
             select: {
               id: true,
               userId: true,
+              currencyId: true,
             },
           },
         },
@@ -118,6 +120,7 @@ const TransactionService: ITransaction = {
           details: transaction.details ?? '',
           merchant: transaction.merchant ?? '',
           transactionDate: transaction.date ?? '',
+          currencyId: transaction.account.currencyId,
         },
       };
     } catch (error) {
@@ -230,7 +233,7 @@ const TransactionService: ITransaction = {
         */
 
         /* Insert deleted transaction */
-        const { transactionType, transactionDate, amount, details, merchant, accountId } = data;
+        const { transactionType, transactionDate, amount, details, merchant, accountId, currencyId } = data;
 
         await this.insertDeletedTransaction({
           amount: new Decimal(amount),
@@ -240,6 +243,7 @@ const TransactionService: ITransaction = {
           transactionDate: transactionDate,
           transactionType: transactionType,
           accountId: accountId,
+          currencyId: currencyId,
         });
 
         /* Delete transaction from account */
@@ -290,6 +294,7 @@ const TransactionService: ITransaction = {
           merchant: args.merchant ?? '',
           transactionDate: args.transactionDate,
           accountId: args.accountId,
+          currencyId: args.currencyId,
         },
       });
     } catch (error) {
@@ -467,35 +472,73 @@ const TransactionService: ITransaction = {
     }
   },
 
-  async getDeletedTransactions(userId: string) {
-    const deletedTransactions = await prisma.user.findMany({
+  async getDeletedTransactions({ currentPage, perPage, userId }) {
+    const deletedTransactionNo = await prisma.deletedTransactions.count({
       where: {
-        id: userId,
-      },
-      select: {
-        accounts: {
-          select: {
-            DeletedTransactions: {
-              select: {
-                id: true,
-                transactionDate: true,
-                transactionType: true,
-                merchant: true,
-                deletedAt: true,
-              },
-            },
-          },
+        account: {
+          userId: userId,
         },
       },
     });
 
-    if (deletedTransactions.length === 0) {
+    console.log('skip is', (currentPage - 1) * perPage);
+    console.log('take is', perPage);
+
+    const deletedTransactionsQuery = await prisma.deletedTransactions.findMany({
+      skip: (currentPage - 1) * perPage,
+      take: perPage,
+      select: {
+        id: true,
+        transactionDate: true,
+        transactionType: true,
+        merchant: true,
+        deletedAt: true,
+        amount: true,
+        details: true,
+        currency: {
+          select: {
+            symbol: true,
+          },
+        },
+      },
+      where: {
+        account: {
+          User: {
+            id: userId,
+          },
+        },
+      },
+      orderBy: {
+        deletedAt: 'desc',
+      },
+    });
+
+    if (deletedTransactionsQuery.length === 0) {
       console.log('No deleted transactions found for userId', userId);
-      return [];
+      return {
+        deletedTransactions: [],
+        deletedTransactionsCount: deletedTransactionNo,
+      };
     }
 
-    console.log('deletedTransactions', JSON.stringify(deletedTransactions));
-    return deletedTransactions[0].accounts.map((acc) => acc.DeletedTransactions[0]);
+    console.log('deletedTransactionsQuery', deletedTransactionsQuery);
+
+    const deletedTransactions = deletedTransactionsQuery.map((acc) => {
+      return {
+        id: acc.id,
+        amount: acc.amount,
+        deletedAt: acc.deletedAt,
+        merchant: acc.merchant,
+        transactionDate: acc.transactionDate,
+        transactionType: acc.transactionType,
+        currencySymbol: acc.currency.symbol,
+      };
+    });
+
+    return {
+      deletedTransactions: deletedTransactions,
+      deletedTransactionsCount: deletedTransactionNo,
+    };
   },
 };
 

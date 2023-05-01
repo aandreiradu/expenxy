@@ -239,15 +239,28 @@ export const getLatestTransactionsController = async (req: Request, res: Respons
   }
 };
 
-export const getDeletedTransactionsController = async (req: Request, res: Response<IResponse>, next: NextFunction) => {
+export const getDeletedTransactionsController = async (
+  req: Request<{}, {}, {}, { page: number }>,
+  res: Response<IResponse>,
+  next: NextFunction,
+) => {
+  const currentPage = req.query.page || 1;
+  const perPage = process.env.EXPENXY_DELETED_TRANSACTIONS_PER_PAGE || 20;
+  console.log('currentPage from frontend', currentPage);
+
   try {
-    const deletedTransactions = await TransactionService.getDeletedTransactions(req.metadata.userId as string);
+    const { deletedTransactions, deletedTransactionsCount } = await TransactionService.getDeletedTransactions({
+      userId: req.metadata.userId as string,
+      currentPage: currentPage,
+      perPage: Number(perPage),
+    });
 
     console.log('deletedTransactions controller', deletedTransactions);
 
     return res.status(200).send({
       data: {
-        ...deletedTransactions,
+        deletedTransactions,
+        deletedTransactionsCount: deletedTransactionsCount,
       },
     });
   } catch (error) {

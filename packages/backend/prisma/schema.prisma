@@ -87,7 +87,8 @@ model Currency {
   code   String @db.VarChar(10)
   symbol String @db.VarChar(10)
 
-  Account Account[]
+  Account             Account[]
+  DeletedTransactions DeletedTransactions[]
 
   @@unique([code, name])
 }
@@ -118,7 +119,9 @@ model DeletedTransactions {
   merchant        String?
   transactionDate DateTime        @db.Timestamp(5)
   deletedAt       DateTime        @default(dbgenerated("(now())")) @db.DateTime(0)
+  currency        Currency        @relation(fields: [currencyId], references: [id])
 
-  account   Account @relation(fields: [accountId], references: [id])
-  accountId String
+  account    Account @relation(fields: [accountId], references: [id])
+  accountId  String
+  currencyId String
 }

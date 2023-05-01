@@ -66,6 +66,7 @@ export type InsertDeletedTransactionsArgs = {
   transactionDate: Date;
   deletedAt: Date;
   accountId: string;
+  currencyId: string;
 };
 
 export type TLatestTransactions = {
@@ -93,10 +94,21 @@ export type EditTranscationReturn = {
   message: string;
 };
 
+export type GetDeletedTransactionsArgs = {
+  userId: string;
+  currentPage: number;
+  perPage: number;
+};
+
 export type DeletedTransactionReturn = {
-  id: string;
-  transactionDate: Date;
-  transactionType: TransactionType;
-  merchant: string | null;
-  deletedAt: Date;
-}[];
+  deletedTransactions: {
+    id: string;
+    transactionDate: Date;
+    transactionType: TransactionType;
+    merchant: string | null;
+    deletedAt: Date;
+    amount: Decimal;
+    currencySymbol: string;
+  }[];
+  deletedTransactionsCount: number;
+};
