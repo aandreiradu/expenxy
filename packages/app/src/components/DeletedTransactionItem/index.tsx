@@ -18,14 +18,12 @@ const DeletedTransactionItem: FC<DeletedTransactionItemArgs> = ({
   transactionType,
   deletedOn,
 }) => {
-  // max-h-5
   return (
     <div className="w-full flex flex-col gap-2 bg-gray-300 text-[#1f1f1f] rounded-md p-2 hover:bg-[#1f1f1f] hover:text-white">
       <div className="flex items-center justify-between">
         <p className="text-left text-base font-semibold w-3/5 max-h-5 overflow-auto">{name}</p>
         <p className="w-2/5 text-right">
-          {amount}
-          <span className="text-sm">{currency}</span>
+          {amount} <span className="text-sm">{currency}</span>
         </p>
       </div>
       <div className="flex justify-between">

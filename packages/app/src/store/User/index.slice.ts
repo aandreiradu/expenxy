@@ -1,5 +1,12 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../store';
+import { AvailableTypes as TransactionTypes } from '../../pages/AddTransaction/types';
+
+type OverviewAccount = {
+  expensesPercentage: number;
+  incomesPercentage: number;
+  favoriteMerchant: string;
+};
 
 type OverviewAccount = {
   expensesPercentage: number;
@@ -20,16 +27,17 @@ export type TTransaction = {
   transactionType: 'Expense' | 'Income';
 };
 
-export interface IUserState {
-  accessToken?: string | null;
-  username?: string | null;
-  fullName?: string | null;
-  imageUrl?: string | null;
-  resetPwToken?: string | null;
-  latestTransactions: TTransaction[];
-  accountSelected: string;
-  accountOverview: OverviewAccount | null;
-}
+export type DeletedTransaction = {
+  id: string;
+  merchant: string;
+  deletedAt: string;
+  transactionDate: string;
+  transactionType: TransactionTypes;
+  amount: number;
+  details: string;
+  currencySymbol: string;
+};
+
 
 const initialState: IUserState = {
   accessToken: null,
@@ -39,6 +47,11 @@ const initialState: IUserState = {
   latestTransactions: [],
   accountSelected: '',
   accountOverview: null,
+  deletedTransactions: {
+    transactions: [],
+    totalTransactions: 0,
+    page: 1,
+  },
 };
 
 export const userSlice = createSlice({
@@ -73,6 +86,20 @@ export const userSlice = createSlice({
     setAccountOverview: (state, action: PayloadAction<OverviewAccount>) => {
       state.accountOverview = action.payload;
     },
+    setDeletedTransactions: (
+      state,
+      action: PayloadAction<{ transactions: DeletedTransaction[]; totalTransactions: number }>,
+    ) => {
+      const { totalTransactions, transactions } = action.payload;
+
+      state.deletedTransactions.transactions = transactions;
+      state.deletedTransactions.totalTransactions = totalTransactions;
+    },
+
+    setDeletedTransactionsPageNo: (state, action: PayloadAction<{ pageNo: number }>) => {
+      state.deletedTransactions.page = action.payload.pageNo;
+    },
+
   },
 });
 
@@ -84,5 +111,7 @@ export const {
   setLatestTransactions,
   setAccountSelected,
   setAccountOverview,
+  setDeletedTransactions,
+  setDeletedTransactionsPageNo,
 } = userSlice.actions;
 export default userSlice.reducer;
