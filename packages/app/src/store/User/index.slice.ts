@@ -8,12 +8,6 @@ type OverviewAccount = {
   favoriteMerchant: string;
 };
 
-type OverviewAccount = {
-  expensesPercentage: number;
-  incomesPercentage: number;
-  favoriteMerchant: string;
-};
-
 export type TTransaction = {
   transactionId: string;
   amount: string;
@@ -38,6 +32,21 @@ export type DeletedTransaction = {
   currencySymbol: string;
 };
 
+export interface IUserState {
+  accessToken?: string | null;
+  username?: string | null;
+  fullName?: string | null;
+  imageUrl?: string | null;
+  resetPwToken?: string | null;
+  latestTransactions: TTransaction[];
+  accountSelected: string;
+  accountOverview: OverviewAccount | null;
+  deletedTransactions: {
+    transactions: DeletedTransaction[];
+    totalTransactions: number;
+    page: number;
+  };
+}
 
 const initialState: IUserState = {
   accessToken: null,
@@ -86,6 +95,7 @@ export const userSlice = createSlice({
     setAccountOverview: (state, action: PayloadAction<OverviewAccount>) => {
       state.accountOverview = action.payload;
     },
+
     setDeletedTransactions: (
       state,
       action: PayloadAction<{ transactions: DeletedTransaction[]; totalTransactions: number }>,
@@ -99,7 +109,6 @@ export const userSlice = createSlice({
     setDeletedTransactionsPageNo: (state, action: PayloadAction<{ pageNo: number }>) => {
       state.deletedTransactions.page = action.payload.pageNo;
     },
-
   },
 });
 
