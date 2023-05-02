@@ -25,7 +25,7 @@ const Home = () => {
 
   return (
     <>
-      <MobileNav />
+      <MobileNav setShowComponent={setShowComponent} />
       <Sidebar setShowComponent={setShowComponent} />
       <MainContent>
         <AddTransaction
@@ -33,13 +33,13 @@ const Home = () => {
           componentName={showComponent.componentName}
           setShowComponent={setShowComponent}
         />
-        <div className="w-full h-full flex md:gap-14 lg:gap-24 py-3">
-          <div className="flex-1 w-full md:max-w-xl h-full flex flex-col justify-between">
+        <div className="w-full h-full flex flex-wrap md:gap-14 lg:gap-24 py-3 px-1">
+          <div className="flex-1 w-full md:max-w-xl flex flex-col md:justify-between">
             <Account />
             <RecentTransactions />
           </div>
-          <div className="md:px-4 md:max-w-2xl flex-1 w-full h-full flex flex-col justify-between">
-            <div className="w-full relative flex overflow-y-auto 2xl:overflow-y-hidden flex-wrap 2xl:flex-nowrap gap-3 items-center justify-between rounded-md h-60">
+          <div className="mt-10 md:mt-0 md:px-4 md:max-w-2xl flex-1 w-full flex flex-wrap flex-col justify-between">
+            <div className="w-full relative flex md:overflow-y-auto 2xl:overflow-y-hidden flex-wrap 2xl:flex-nowrap gap-3 items-center justify-between rounded-md h-60">
               <BalanceWidget selectedAccount={selectedAccount} />
               <CardInfoWidget selectedAccount={selectedAccount} />
             </div>

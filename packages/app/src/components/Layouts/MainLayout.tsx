@@ -17,7 +17,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <>
-      <MobileNav />
+      <MobileNav setShowComponent={setShowComponent} />
       <Sidebar setShowComponent={setShowComponent} />
       <MainContent>
         <AddTransaction

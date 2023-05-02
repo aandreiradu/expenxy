@@ -1,11 +1,22 @@
 import { Transition } from '@headlessui/react';
-import { List, X } from 'phosphor-react';
-import { useCallback, useState } from 'react';
-import { sidebarNavigation } from '../Sidebar';
+import { List, SignOut, X } from 'phosphor-react';
+import { FC, useCallback, useEffect, useState } from 'react';
+import { ISidebarProps, sidebarNavigation } from '../Sidebar';
 import SidebarLink from '../Sidebar/SidebarLink';
+import { useHttpRequest } from '../../hooks/useHttp';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { logOut } from '../../store/User/index.slice';
 
-const MobileNav = () => {
+const MobileNav: FC<ISidebarProps> = ({ setShowComponent }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { sendRequest, error, isLoading } = useHttpRequest();
   const [show, setShow] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<{
+    show: boolean;
+    message: string;
+  }>({ show: false, message: '' });
 
   const sidebarHandler = useCallback(() => {
     if (show) {
@@ -16,6 +27,33 @@ const MobileNav = () => {
       setShow(true);
     }
   }, [show]);
+
+  const handleLogOut = useCallback(async () => {
+    const response = await sendRequest({
+      method: 'GET',
+      url: '/logout',
+      withCredentials: true,
+    });
+
+    if (response?.data) {
+      const { status } = response;
+      const { message } = response.data;
+
+      if ((message === 'Logout completed' && status === 200) || status === 204) {
+        dispatch(logOut());
+        navigate('/login');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (error) {
+      setShowModal({
+        show: true,
+        message: error.message || 'Unexpected error occured',
+      });
+    }
+  }, [error]);
 
   return (
     <>
@@ -56,12 +94,32 @@ const MobileNav = () => {
             <ul>
               {sidebarNavigation.map((si) => (
                 <li key={si.href} className="flex items-center text-white my-7 cursor-pointer">
-                  <SidebarLink href={si.href} icon={si.icon} name={si.name} className="mr-2 hover:pointer-events-none p-1" />
-                  {si.name}
+                  <SidebarLink
+                    key={si.href}
+                    href={si.href}
+                    icon={si.icon}
+                    setShowComponent={() => {
+                      setShowComponent({ show: true, componentName: si.name });
+                      setShow(false);
+                    }}
+                    name={si.name}
+                    isLink={si.isLink}
+                    className="flex items-center gap-2"
+                  >
+                    {si.name}
+                  </SidebarLink>
                 </li>
               ))}
             </ul>
             {/* </section> */}
+
+            <div
+              className="cursor-pointer mt-auto p-3 flex items-center gap-x-2 rounded-md relative before:absolute before:left-0 before:-top-4 before:w-full before:h-[1px] before:bg-gray-400"
+              onClick={handleLogOut}
+            >
+              <SignOut className=" w-8 h-8 text-white rotate-180 group-hover:text-white " onClick={handleLogOut} />
+              <span className="text-base text-white">LogOut</span>
+            </div>
           </Transition.Child>
         </Transition.Root>
       )}

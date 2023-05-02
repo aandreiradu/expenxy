@@ -120,7 +120,7 @@ const DeletedTransactions = () => {
             onNext={handlePageChanged.bind(this, 'NEXT')}
             onPrevious={handlePageChanged.bind(this, 'PREV')}
           >
-            <div className="mt-3 flex flex-col lg:grid lg:grid-cols-150_1fr gap-x-5 gap-y-5 mb-2">
+            <div className="my-3 flex flex-col lg:grid lg:grid-cols-150_1fr gap-x-5 gap-y-5">
               {transactionsDeleted?.map((transaction) => (
                 <DeletedTransactionItem
                   key={transaction.id}

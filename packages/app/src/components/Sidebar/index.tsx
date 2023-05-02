@@ -39,21 +39,9 @@ export const sidebarNavigation: SidebarLinkProps[] = [
     name: 'Trash',
     setShowComponent: () => {},
   },
-  {
-    href: '/user',
-    icon: <User className={sidebarIconClasses} />,
-    name: 'User',
-    setShowComponent: () => {},
-  },
-  {
-    href: '/settings',
-    icon: <Gear className={sidebarIconClasses} />,
-    name: 'Settings',
-    setShowComponent: () => {},
-  },
 ];
 
-interface ISidebarProps {
+export interface ISidebarProps {
   setShowComponent: Dispatch<
     SetStateAction<{
       show: boolean;

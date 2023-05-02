@@ -65,7 +65,7 @@ const RecentTransactions = () => {
   }, []);
 
   return (
-    <div className="relative w-full h-full max-h-[350px] overflow-hidden">
+    <div className="relative w-full h-full max-h-96 md:max-h-[350px] mt-6 md:mt-0 overflow-x-hidden">
       {error && topLevelNotification.show && (
         <TopLevelNotification
           hasCloseButton={false}
@@ -83,7 +83,7 @@ const RecentTransactions = () => {
         />
       )}
 
-      <div className="sticky top-0 left-0 w-full flex justify-between items-center py-3">
+      <div className="w-full flex justify-between items-center py-3 overflow-hidden">
         <p className="text-black font-bold text-lg">Recent Transactions</p>
         {latestTransactions?.length > 0 && (
           <span className="w-fit text-xl cursor-pointer relative after:content-[''] after:absolute after:w-full after:bottom-0 after:left-0 after:h-[2px] after:bg-gray-400 px-5 leading-7 text-[12px] text-gray-400 after:hover:w-full after:hover:animate-growingWidth after:focus:w-full after:focus:animate-growingWidth after:hover:bg-yellow-400">
@@ -91,7 +91,7 @@ const RecentTransactions = () => {
           </span>
         )}
       </div>
-      <div className="relative w-full h-full max-h-[300px] flex flex-col items-center gap-3 overflow-y-auto">
+      <div className="relative w-full h-full md:max-h-[300px] flex flex-col items-center gap-3 overflow-auto">
         {isLoading ? (
           <div className="max-w-md mt-5">
             <Loader
