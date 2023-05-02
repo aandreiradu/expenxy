@@ -36,7 +36,7 @@ const Account = () => {
         if (currentScrollLeft >= maxScrollLeft) {
           carousel.current.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
-          carousel.current.scrollTo({ left: carousel.current.scrollLeft + 208, behavior: 'smooth' });
+          carousel.current.scrollTo({ left: carousel.current.scrollLeft + 212, behavior: 'smooth' });
         }
 
         break;
@@ -48,7 +48,7 @@ const Account = () => {
         if (currentScrollLeft === 0) {
           carousel.current.scrollTo({ left: maxScrollLeft, behavior: 'smooth' });
         } else {
-          carousel.current.scrollTo({ left: carousel.current.scrollLeft - 208, behavior: 'smooth' });
+          carousel.current.scrollTo({ left: carousel.current.scrollLeft - 212, behavior: 'smooth' });
         }
 
         break;
@@ -136,12 +136,13 @@ const Account = () => {
   return userAccounts?.length > 0 ? (
     <div
       className="
-        relative rounded-md flex gap-5 items-center bg-white px-5
-        w-full max-w-xl h-full md:h-60
+        relative rounded-md flex gap-5 items-center bg-white
+        w-full md:max-w-xl h-48 md:h-60
         shadow-[rgba(13,_38,_76,_0.19)_0px_9px_20px]
+        px-4 md:px-5
       "
     >
-      <div className="absolute top-[50%] -translate-y-1/2 -left-5 bg-[#1f1f1f] p-1 rounded">
+      <div className="absolute top-[50%] -translate-y-1/2 -left-4 md:-left-5 bg-[#1f1f1f] p-[2px] md:p-1 rounded">
         <ArrowLeft cursor="pointer" className="w-6 h-6 text-white" onClick={handleArrowsClicks.bind(this, 'right')} />
       </div>
       <div className="w-full overflow-y-auto flex gap-3" ref={carousel}>
@@ -156,7 +157,7 @@ const Account = () => {
           />
         ))}
       </div>
-      <div className="absolute top-[50%] -translate-y-1/2 -right-5 bg-[#1f1f1f] p-1 rounded">
+      <div className="absolute top-[50%] -translate-y-1/2 -right-4 md:-right-5 bg-[#1f1f1f] p-[2px] md:p-1 rounded">
         <ArrowRight cursor="pointer" className="w-6 h-6 text-white" onClick={handleArrowsClicks.bind(this, 'left')} />
       </div>
     </div>

@@ -61,7 +61,7 @@ const BankCard: FC<BankCard> = ({ balance, currency, name, type, accountId }) =>
     <div
       className={`${
         isSelected && 'border-4 border-yellow-400'
-      } relative rounded-lg md:h-36 md:w-60 bg-black flex flex-shrink-0 flex-col text-white p-2 ${classes}`}
+      } relative rounded-lg md:h-36 w-52 md:w-60 bg-black flex flex-shrink-0 flex-col text-white p-2 ${classes}`}
       onClick={handleAccountSelect}
     >
       {/* <div className="z-0 absolute top-0 left-0 right-0 bg-black/20 w-full h-full overflow-hidden rounded-lg"></div> */}
